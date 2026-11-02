@@ -1,0 +1,16 @@
+﻿categoria_id,categoria,emoji,tipo
+vivienda,Vivienda,🏠,fijo
+servicios,Servicios,💡,fijo
+suscripciones,Suscripciones,📺,fijo
+educacion,Educación,📚,fijo
+supermercado,Supermercado,🛒,variable
+comida-afuera,Comida afuera,🍕,variable
+transporte,Transporte,🚗,variable
+salud,Salud,💊,variable
+ocio,Ocio,🎬,variable
+ropa,Ropa,👕,variable
+hogar,Hogar,🛋️,variable
+mascotas,Mascotas,🐾,variable
+regalos,Regalos,🎁,variable
+viajes,Viajes,✈️,variable
+otros,Otros,📦,variable

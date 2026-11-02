@@ -1,0 +1,423 @@
+﻿id,fecha,monto,categoria_id,descripcion,medio_pago,moneda,monto_original,tarjeta_id
+demo-0033,2025-11-01,24750.00,ocio,Juego,efectivo,ARS,,
+demo-0036,2025-11-01,21650.00,mascotas,Veterinaria,debito,ARS,,
+demo-0013,2025-11-02,20950.00,supermercado,Verdulería,credito,ARS,,demo-card-visa
+demo-0007,2025-11-03,10498.00,suscripciones,Netflix,credito,USD,7.24,demo-card-visa
+demo-0008,2025-11-04,5017.00,suscripciones,Spotify,credito,USD,3.46,demo-card-visa
+demo-0019,2025-11-04,19600.00,supermercado,Supermercado,debito,ARS,,
+demo-0027,2025-11-04,21550.00,comida-afuera,Café,efectivo,ARS,,
+demo-0001,2025-11-05,416550.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0009,2025-11-05,4756.00,suscripciones,iCloud,credito,USD,3.28,demo-card-visa
+demo-0037,2025-11-05,16750.00,regalos,Regalo,credito,ARS,,demo-card-visa
+demo-0010,2025-11-06,5162.00,suscripciones,Disney+,credito,USD,3.56,demo-card-visa
+demo-0030,2025-11-07,29200.00,transporte,Nafta,efectivo,ARS,,
+demo-0031,2025-11-07,24850.00,salud,Prepaga copago,debito,ARS,,
+demo-0014,2025-11-08,43550.00,supermercado,Supermercado,debito,ARS,,
+demo-0016,2025-11-09,30150.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0021,2025-11-09,21700.00,comida-afuera,Delivery,debito,ARS,,
+demo-0002,2025-11-10,65300.00,vivienda,Expensas,transferencia,ARS,,
+demo-0003,2025-11-12,27900.00,servicios,Luz,debito,ARS,,
+demo-0032,2025-11-12,12650.00,ocio,Recital,credito,ARS,,demo-card-visa
+demo-0004,2025-11-13,29700.00,servicios,Gas,debito,ARS,,
+demo-0005,2025-11-14,27150.00,servicios,Internet,debito,ARS,,
+demo-0025,2025-11-14,24200.00,comida-afuera,Pizzería,efectivo,ARS,,
+demo-0006,2025-11-15,28000.00,servicios,Celular,debito,ARS,,
+demo-0012,2025-11-15,49750.00,supermercado,Supermercado,debito,ARS,,
+demo-0011,2025-11-16,20050.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0024,2025-11-18,14800.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0020,2025-11-19,53200.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0017,2025-11-21,45350.00,supermercado,Almacén,debito,ARS,,
+demo-0035,2025-11-22,23750.00,mascotas,Alimento,debito,ARS,,
+demo-0015,2025-11-23,51650.00,supermercado,Verdulería,debito,ARS,,
+demo-0022,2025-11-25,11150.00,comida-afuera,Almuerzo,debito,ARS,,
+demo-0026,2025-11-27,16750.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0023,2025-11-28,16800.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0028,2025-11-28,10700.00,comida-afuera,Cena afuera,efectivo,ARS,,
+demo-0034,2025-11-28,14200.00,ocio,Juego,credito,ARS,,demo-card-visa
+demo-0018,2025-11-29,35400.00,supermercado,Almacén,debito,ARS,,
+demo-0029,2025-11-30,21700.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0073,2025-12-01,23000.00,regalos,Cumpleaños,credito,ARS,,demo-card-visa
+demo-0061,2025-12-02,14600.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0044,2025-12-03,13748.00,suscripciones,Netflix,credito,USD,9.25,demo-card-visa
+demo-0053,2025-12-03,26050.00,supermercado,Verdulería,credito,ARS,,demo-card-visa
+demo-0067,2025-12-03,28100.00,ocio,Salida,efectivo,ARS,,
+demo-0045,2025-12-04,6123.00,suscripciones,Spotify,credito,USD,4.12,demo-card-visa
+demo-0068,2025-12-04,27100.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0038,2025-12-05,426000.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0046,2025-12-05,5024.00,suscripciones,iCloud,credito,USD,3.38,demo-card-visa
+demo-0050,2025-12-05,43600.00,supermercado,Almacén,debito,ARS,,
+demo-0047,2025-12-07,45250.00,educacion,Curso online,credito,ARS,,demo-card-visa
+demo-0069,2025-12-08,24650.00,ocio,Juego,credito,ARS,,demo-card-visa
+demo-0072,2025-12-09,36050.00,mascotas,Veterinaria,debito,ARS,,
+demo-0039,2025-12-10,64900.00,vivienda,Expensas,transferencia,ARS,,
+demo-0040,2025-12-12,29200.00,servicios,Luz,debito,ARS,,
+demo-0058,2025-12-12,9600.00,comida-afuera,Delivery,debito,ARS,,
+demo-0041,2025-12-13,29100.00,servicios,Gas,debito,ARS,,
+demo-0051,2025-12-13,40750.00,supermercado,Almacén,debito,ARS,,
+demo-0042,2025-12-14,27900.00,servicios,Internet,debito,ARS,,
+demo-0056,2025-12-14,53700.00,supermercado,Carnicería,debito,ARS,,
+demo-0064,2025-12-14,27300.00,transporte,Nafta,debito,ARS,,
+demo-0066,2025-12-14,14300.00,salud,Farmacia,debito,ARS,,
+demo-0043,2025-12-15,27900.00,servicios,Celular,debito,ARS,,
+demo-0065,2025-12-16,25150.00,transporte,Remis,efectivo,ARS,,
+demo-0049,2025-12-17,52200.00,supermercado,Almacén,debito,ARS,,
+demo-0063,2025-12-17,30950.00,transporte,Remis,debito,ARS,,
+demo-0060,2025-12-22,11900.00,comida-afuera,Café,credito,ARS,,demo-card-visa
+demo-0059,2025-12-23,26850.00,comida-afuera,Almuerzo,debito,ARS,,
+demo-0054,2025-12-24,58100.00,supermercado,Almacén,credito,ARS,,demo-card-visa
+demo-0070,2025-12-24,65450.00,ropa,Ropa,credito,ARS,,demo-card-visa
+demo-0062,2025-12-25,42150.00,transporte,Nafta,efectivo,ARS,,
+demo-0071,2025-12-25,57900.00,ropa,Zapatillas,credito,ARS,,demo-card-visa
+demo-0048,2025-12-26,36600.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0055,2025-12-26,52700.00,supermercado,Verdulería,debito,ARS,,
+demo-0052,2025-12-27,52300.00,supermercado,Carnicería,debito,ARS,,
+demo-0057,2025-12-30,43850.00,supermercado,Supermercado,efectivo,ARS,,
+demo-0102,2026-01-01,28550.00,salud,Prepaga copago,debito,ARS,,
+demo-0092,2026-01-02,26650.00,supermercado,La Anónima,debito,ARS,,
+demo-0094,2026-01-02,14550.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0100,2026-01-02,28250.00,transporte,Nafta,debito,ARS,,
+demo-0080,2026-01-03,17824.00,suscripciones,Netflix,credito,USD,11.70,demo-card-visa
+demo-0081,2026-01-04,15082.00,suscripciones,Spotify,credito,USD,9.90,demo-card-visa
+demo-0074,2026-01-05,443850.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0082,2026-01-05,13223.00,suscripciones,iCloud,credito,USD,8.68,demo-card-visa
+demo-0083,2026-01-06,16422.00,suscripciones,Disney+,credito,USD,10.78,demo-card-visa
+demo-0106,2026-01-07,20000.00,hogar,Ferretería,debito,ARS,,
+demo-0075,2026-01-10,65750.00,vivienda,Expensas,transferencia,ARS,,
+demo-0084,2026-01-10,55100.00,supermercado,Verdulería,debito,ARS,,
+demo-0096,2026-01-11,11350.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0076,2026-01-12,30300.00,servicios,Luz,debito,ARS,,
+demo-0093,2026-01-12,53050.00,supermercado,Almacén,credito,ARS,,demo-card-visa
+demo-0077,2026-01-13,30900.00,servicios,Gas,debito,ARS,,
+demo-0078,2026-01-14,29400.00,servicios,Internet,debito,ARS,,
+demo-0091,2026-01-14,44550.00,supermercado,Carnicería,credito,ARS,,demo-card-visa
+demo-0104,2026-01-14,79200.00,ropa,Ropa,credito,ARS,,demo-card-visa
+demo-0079,2026-01-15,29650.00,servicios,Celular,debito,ARS,,
+demo-0097,2026-01-15,14750.00,comida-afuera,Café,efectivo,ARS,,
+demo-0087,2026-01-16,30950.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0090,2026-01-16,55600.00,supermercado,Carnicería,debito,ARS,,
+demo-0098,2026-01-16,36700.00,transporte,Nafta,efectivo,ARS,,
+demo-0085,2026-01-17,53350.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0108,2026-01-17,39250.00,mascotas,Alimento,debito,ARS,,
+demo-0109,2026-01-18,24700.00,mascotas,Alimento,debito,ARS,,
+demo-0101,2026-01-19,30950.00,salud,Consulta,debito,ARS,,
+demo-0107,2026-01-21,17400.00,hogar,Bazar,debito,ARS,,
+demo-0086,2026-01-22,26000.00,supermercado,Supermercado,efectivo,ARS,,
+demo-0099,2026-01-22,47700.00,transporte,Nafta,debito,ARS,,
+demo-0088,2026-01-23,48500.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0110,2026-01-24,19750.00,regalos,Regalo,credito,ARS,,demo-card-visa
+demo-0103,2026-01-25,21100.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0095,2026-01-27,21300.00,comida-afuera,Almuerzo,efectivo,ARS,,
+demo-0089,2026-01-28,41700.00,supermercado,Verdulería,debito,ARS,,
+demo-0105,2026-01-30,39050.00,ropa,Zapatillas,credito,ARS,,demo-card-visa
+demo-0125,2026-02-01,49450.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0123,2026-02-02,44450.00,supermercado,Verdulería,debito,ARS,,
+demo-0117,2026-02-03,11961.00,suscripciones,Netflix,credito,USD,7.66,demo-card-visa
+demo-0118,2026-02-04,10946.00,suscripciones,Spotify,credito,USD,7.01,demo-card-visa
+demo-0111,2026-02-05,462600.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0119,2026-02-05,8229.00,suscripciones,iCloud,credito,USD,5.27,demo-card-visa
+demo-0126,2026-02-06,35550.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0141,2026-02-08,17650.00,hogar,Limpieza,debito,ARS,,
+demo-0112,2026-02-10,65400.00,vivienda,Expensas,transferencia,ARS,,
+demo-0142,2026-02-11,21700.00,hogar,Bazar,debito,ARS,,
+demo-0113,2026-02-12,30000.00,servicios,Luz,debito,ARS,,
+demo-0114,2026-02-13,30750.00,servicios,Gas,debito,ARS,,
+demo-0115,2026-02-14,31000.00,servicios,Internet,debito,ARS,,
+demo-0116,2026-02-15,32450.00,servicios,Celular,debito,ARS,,
+demo-0121,2026-02-15,22150.00,supermercado,Carnicería,debito,ARS,,
+demo-0124,2026-02-15,39900.00,supermercado,Verdulería,credito,ARS,,demo-card-visa
+demo-0143,2026-02-15,48350.00,mascotas,Alimento,debito,ARS,,
+demo-0128,2026-02-16,19300.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0132,2026-02-16,38250.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0127,2026-02-18,27200.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0139,2026-02-18,18850.00,ocio,Juego,efectivo,ARS,,
+demo-0138,2026-02-21,11850.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0129,2026-02-22,12050.00,comida-afuera,Pizzería,debito,ARS,,
+demo-0136,2026-02-22,19600.00,salud,Prepaga copago,debito,ARS,,
+demo-0140,2026-02-23,73400.00,ropa,Zapatillas,credito,ARS,,demo-card-visa
+demo-0120,2026-02-25,35350.00,supermercado,Verdulería,debito,ARS,,
+demo-0122,2026-02-26,51700.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0131,2026-02-26,10900.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0137,2026-02-26,27400.00,salud,Farmacia,debito,ARS,,
+demo-0130,2026-02-27,25850.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0134,2026-02-27,45200.00,transporte,Nafta,debito,ARS,,
+demo-0133,2026-02-28,51000.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0135,2026-02-28,18450.00,transporte,Remis,efectivo,ARS,,
+demo-0163,2026-03-01,22900.00,comida-afuera,Pizzería,efectivo,ARS,,
+demo-0171,2026-03-01,26700.00,ocio,Salida,credito,ARS,,demo-card-visa
+demo-0155,2026-03-02,47250.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0150,2026-03-03,6178.00,suscripciones,Netflix,credito,USD,3.86,demo-card-visa
+demo-0151,2026-03-04,4802.00,suscripciones,Spotify,credito,USD,3.00,demo-card-visa
+demo-0144,2026-03-05,485500.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0152,2026-03-05,12356.00,suscripciones,iCloud,credito,USD,7.72,demo-card-visa
+demo-0173,2026-03-05,40000.00,mascotas,Alimento,debito,ARS,,
+demo-0164,2026-03-08,29050.00,comida-afuera,Café,efectivo,ARS,,
+demo-0172,2026-03-09,18000.00,mascotas,Alimento,debito,ARS,,
+demo-0145,2026-03-10,70500.00,vivienda,Expensas,transferencia,ARS,,
+demo-0162,2026-03-10,29450.00,comida-afuera,Cena afuera,efectivo,ARS,,
+demo-0165,2026-03-10,20100.00,comida-afuera,Café,credito,ARS,,demo-card-visa
+demo-0154,2026-03-11,29300.00,supermercado,Carnicería,credito,ARS,,demo-card-visa
+demo-0174,2026-03-11,23450.00,regalos,Regalo,credito,ARS,,demo-card-visa
+demo-0146,2026-03-12,29350.00,servicios,Luz,debito,ARS,,
+demo-0167,2026-03-12,33400.00,transporte,Nafta,efectivo,ARS,,
+demo-0147,2026-03-13,31950.00,servicios,Gas,debito,ARS,,
+demo-0148,2026-03-14,31150.00,servicios,Internet,debito,ARS,,
+demo-0159,2026-03-14,46000.00,supermercado,Supermercado,credito,ARS,,demo-card-visa
+demo-0149,2026-03-15,32850.00,servicios,Celular,debito,ARS,,
+demo-0156,2026-03-18,38400.00,supermercado,Verdulería,debito,ARS,,
+demo-0157,2026-03-19,29150.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0153,2026-03-20,21050.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0168,2026-03-21,25250.00,salud,Prepaga copago,debito,ARS,,
+demo-0170,2026-03-21,24850.00,ocio,Salida,credito,ARS,,demo-card-visa
+demo-0158,2026-03-23,32800.00,supermercado,Almacén,efectivo,ARS,,
+demo-0169,2026-03-27,22900.00,salud,Consulta,debito,ARS,,
+demo-0161,2026-03-29,42300.00,supermercado,Almacén,debito,ARS,,
+demo-0166,2026-03-30,39800.00,transporte,Nafta,efectivo,ARS,,
+demo-0160,2026-03-31,58350.00,supermercado,Carnicería,debito,ARS,,
+demo-0201,2026-04-01,52950.00,transporte,Estacionamiento,debito,ARS,,
+demo-0206,2026-04-01,32900.00,ocio,Juego,efectivo,ARS,,
+demo-0192,2026-04-02,26700.00,supermercado,Supermercado,efectivo,ARS,,
+demo-0200,2026-04-02,31950.00,transporte,Remis,debito,ARS,,
+demo-0210,2026-04-02,44500.00,mascotas,Alimento,debito,ARS,,
+demo-0181,2026-04-03,5430.00,suscripciones,Netflix,credito,USD,3.31,demo-card-visa
+demo-0207,2026-04-03,25700.00,ocio,Juego,efectivo,ARS,,
+demo-0182,2026-04-04,6316.00,suscripciones,Spotify,credito,USD,3.85,demo-card-visa
+demo-0202,2026-04-04,25000.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0175,2026-04-05,443600.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0183,2026-04-05,12632.00,suscripciones,iCloud,credito,USD,7.70,demo-card-visa
+demo-0184,2026-04-06,19342.00,suscripciones,Disney+,credito,USD,11.79,demo-card-visa
+demo-0186,2026-04-07,61050.00,supermercado,Supermercado,credito,ARS,,demo-card-visa
+demo-0191,2026-04-07,39950.00,supermercado,La Anónima,debito,ARS,,
+demo-0208,2026-04-07,17400.00,hogar,Bazar,debito,ARS,,
+demo-0189,2026-04-08,46850.00,supermercado,Verdulería,credito,ARS,,demo-card-visa
+demo-0209,2026-04-09,23750.00,hogar,Limpieza,efectivo,ARS,,
+demo-0176,2026-04-10,77750.00,vivienda,Expensas,transferencia,ARS,,
+demo-0188,2026-04-11,49200.00,supermercado,Almacén,efectivo,ARS,,
+demo-0177,2026-04-12,32500.00,servicios,Luz,debito,ARS,,
+demo-0196,2026-04-12,12600.00,comida-afuera,Almuerzo,credito,ARS,,demo-card-visa
+demo-0178,2026-04-13,32950.00,servicios,Gas,debito,ARS,,
+demo-0179,2026-04-14,31200.00,servicios,Internet,debito,ARS,,
+demo-0193,2026-04-14,17900.00,comida-afuera,Almuerzo,efectivo,ARS,,
+demo-0194,2026-04-14,17300.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0199,2026-04-14,33200.00,transporte,Nafta,debito,ARS,,
+demo-0180,2026-04-15,29950.00,servicios,Celular,debito,ARS,,
+demo-0204,2026-04-16,32950.00,salud,Farmacia,debito,ARS,,
+demo-0187,2026-04-17,40450.00,supermercado,Supermercado,debito,ARS,,
+demo-0195,2026-04-18,15550.00,comida-afuera,Delivery,efectivo,ARS,,
+demo-0185,2026-04-21,52150.00,educacion,Libros técnicos,credito,ARS,,demo-card-visa
+demo-0190,2026-04-22,46050.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0197,2026-04-23,21900.00,comida-afuera,Delivery,debito,ARS,,
+demo-0203,2026-04-26,34550.00,salud,Farmacia,debito,ARS,,
+demo-0198,2026-04-27,14050.00,comida-afuera,Almuerzo,credito,ARS,,demo-card-visa
+demo-0205,2026-04-28,32400.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0231,2026-05-01,25250.00,comida-afuera,Delivery,credito,ARS,,demo-card-visa
+demo-0229,2026-05-02,63850.00,supermercado,Carnicería,debito,ARS,,
+demo-0232,2026-05-02,27100.00,comida-afuera,Delivery,efectivo,ARS,,
+demo-0244,2026-05-02,42550.00,mascotas,Veterinaria,debito,ARS,,
+demo-0217,2026-05-03,11485.00,suscripciones,Netflix,credito,USD,6.83,demo-card-visa
+demo-0222,2026-05-03,49450.00,supermercado,Carnicería,credito,ARS,,demo-card-visa
+demo-0218,2026-05-04,19254.00,suscripciones,Spotify,credito,USD,11.45,demo-card-visa
+demo-0211,2026-05-05,522100.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0219,2026-05-05,8542.00,suscripciones,iCloud,credito,USD,5.08,demo-card-visa
+demo-0224,2026-05-05,42250.00,supermercado,Carnicería,debito,ARS,,
+demo-0241,2026-05-05,28450.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0220,2026-05-06,14260.00,suscripciones,Disney+,credito,USD,8.48,demo-card-visa
+demo-0225,2026-05-07,65150.00,supermercado,Almacén,debito,ARS,,
+demo-0243,2026-05-09,46100.00,mascotas,Alimento,debito,ARS,,
+demo-0212,2026-05-10,72750.00,vivienda,Expensas,transferencia,ARS,,
+demo-0230,2026-05-10,33850.00,supermercado,Supermercado,debito,ARS,,
+demo-0237,2026-05-10,43750.00,transporte,Remis,debito,ARS,,
+demo-0228,2026-05-11,53950.00,supermercado,Supermercado,efectivo,ARS,,
+demo-0213,2026-05-12,33000.00,servicios,Luz,debito,ARS,,
+demo-0214,2026-05-13,32950.00,servicios,Gas,debito,ARS,,
+demo-0215,2026-05-14,34450.00,servicios,Internet,debito,ARS,,
+demo-0221,2026-05-14,47250.00,educacion,Curso online,credito,ARS,,demo-card-visa
+demo-0216,2026-05-15,33100.00,servicios,Celular,debito,ARS,,
+demo-0233,2026-05-18,19900.00,comida-afuera,Café,debito,ARS,,
+demo-0234,2026-05-19,16700.00,comida-afuera,Pizzería,efectivo,ARS,,
+demo-0238,2026-05-20,47900.00,transporte,Remis,efectivo,ARS,,
+demo-0235,2026-05-23,24350.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0227,2026-05-27,33950.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0240,2026-05-27,19200.00,salud,Farmacia,debito,ARS,,
+demo-0223,2026-05-28,59700.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0226,2026-05-29,61950.00,supermercado,La Anónima,debito,ARS,,
+demo-0239,2026-05-29,27950.00,salud,Consulta,debito,ARS,,
+demo-0236,2026-05-31,29650.00,transporte,Remis,debito,ARS,,
+demo-0242,2026-05-31,17050.00,hogar,Limpieza,efectivo,ARS,,
+demo-0254,2026-06-02,35600.00,supermercado,Almacén,efectivo,ARS,,
+demo-0251,2026-06-03,18184.00,suscripciones,Netflix,credito,USD,10.55,demo-card-visa
+demo-0265,2026-06-03,27650.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0252,2026-06-04,13961.00,suscripciones,Spotify,credito,USD,8.10,demo-card-visa
+demo-0245,2026-06-05,508550.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0253,2026-06-05,11531.00,suscripciones,iCloud,credito,USD,6.69,demo-card-visa
+demo-0263,2026-06-06,29400.00,comida-afuera,Delivery,debito,ARS,,
+demo-0258,2026-06-07,63050.00,supermercado,Almacén,credito,ARS,,demo-card-visa
+demo-0279,2026-06-07,21000.00,hogar,Ferretería,efectivo,ARS,,
+demo-0280,2026-06-09,9300.00,hogar,Ferretería,debito,ARS,,
+demo-0246,2026-06-10,80950.00,vivienda,Expensas,transferencia,ARS,,
+demo-0275,2026-06-10,24150.00,ocio,Juego,efectivo,ARS,,
+demo-0272,2026-06-11,18200.00,salud,Farmacia,debito,ARS,,
+demo-0247,2026-06-12,35500.00,servicios,Luz,debito,ARS,,
+demo-0259,2026-06-12,56650.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0248,2026-06-13,35700.00,servicios,Gas,debito,ARS,,
+demo-0249,2026-06-14,31100.00,servicios,Internet,debito,ARS,,
+demo-0260,2026-06-14,49350.00,supermercado,Supermercado,debito,ARS,,
+demo-0250,2026-06-15,34450.00,servicios,Celular,debito,ARS,,
+demo-0261,2026-06-15,44700.00,supermercado,Carnicería,debito,ARS,,
+demo-0271,2026-06-15,51650.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0268,2026-06-16,22100.00,transporte,Nafta,debito,ARS,,
+demo-0278,2026-06-17,35400.00,ropa,Campera,credito,ARS,,demo-card-visa
+demo-0255,2026-06-18,46600.00,supermercado,La Anónima,debito,ARS,,
+demo-0266,2026-06-19,22700.00,comida-afuera,Cena afuera,efectivo,ARS,,
+demo-0270,2026-06-19,46800.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0273,2026-06-19,20350.00,salud,Prepaga copago,debito,ARS,,
+demo-0257,2026-06-20,33750.00,supermercado,Supermercado,debito,ARS,,
+demo-0262,2026-06-21,59200.00,supermercado,Carnicería,debito,ARS,,
+demo-0264,2026-06-23,16650.00,comida-afuera,Delivery,debito,ARS,,
+demo-0276,2026-06-23,29700.00,ocio,Recital,efectivo,ARS,,
+demo-0282,2026-06-23,25850.00,mascotas,Alimento,debito,ARS,,
+demo-0269,2026-06-25,36600.00,transporte,Nafta,debito,ARS,,
+demo-0277,2026-06-26,71950.00,ropa,Ropa,credito,ARS,,demo-card-visa
+demo-0256,2026-06-27,35500.00,supermercado,Supermercado,efectivo,ARS,,
+demo-0283,2026-06-27,35700.00,regalos,Regalo,credito,ARS,,demo-card-visa
+demo-0267,2026-06-30,14350.00,comida-afuera,Delivery,efectivo,ARS,,
+demo-0274,2026-06-30,17650.00,ocio,Recital,credito,ARS,,demo-card-visa
+demo-0281,2026-06-30,30050.00,mascotas,Alimento,debito,ARS,,
+demo-0303,2026-07-01,17150.00,comida-afuera,Café,debito,ARS,,
+demo-0290,2026-07-03,18515.00,suscripciones,Netflix,credito,USD,10.48,demo-card-visa
+demo-0302,2026-07-03,21850.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0291,2026-07-04,5936.00,suscripciones,Spotify,credito,USD,3.36,demo-card-visa
+demo-0312,2026-07-04,16700.00,ocio,Recital,credito,ARS,,demo-card-visa
+demo-0284,2026-07-05,529650.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0292,2026-07-05,11448.00,suscripciones,iCloud,credito,USD,6.48,demo-card-visa
+demo-0293,2026-07-06,15317.00,suscripciones,Disney+,credito,USD,8.67,demo-card-visa
+demo-0294,2026-07-07,31600.00,educacion,Curso online,credito,ARS,,demo-card-visa
+demo-0308,2026-07-08,33950.00,transporte,Remis,debito,ARS,,
+demo-0285,2026-07-10,75750.00,vivienda,Expensas,transferencia,ARS,,
+demo-0310,2026-07-10,28950.00,transporte,Estacionamiento,debito,ARS,,
+demo-0296,2026-07-11,46550.00,supermercado,Supermercado,debito,ARS,,
+demo-0307,2026-07-11,25350.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0286,2026-07-12,35850.00,servicios,Luz,debito,ARS,,
+demo-0287,2026-07-13,36350.00,servicios,Gas,debito,ARS,,
+demo-0288,2026-07-14,35300.00,servicios,Internet,debito,ARS,,
+demo-0289,2026-07-15,32450.00,servicios,Celular,debito,ARS,,
+demo-0301,2026-07-15,41850.00,supermercado,Supermercado,credito,ARS,,demo-card-visa
+demo-0309,2026-07-16,32650.00,transporte,Nafta,debito,ARS,,
+demo-0298,2026-07-17,26050.00,supermercado,Almacén,credito,ARS,,demo-card-visa
+demo-0313,2026-07-18,22100.00,ocio,Recital,efectivo,ARS,,
+demo-0318,2026-07-19,50200.00,mascotas,Alimento,debito,ARS,,
+demo-0305,2026-07-20,15750.00,comida-afuera,Almuerzo,credito,ARS,,demo-card-visa
+demo-0316,2026-07-20,12550.00,hogar,Ferretería,debito,ARS,,
+demo-0299,2026-07-21,28550.00,supermercado,La Anónima,credito,ARS,,demo-card-visa
+demo-0297,2026-07-22,45050.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0306,2026-07-22,29050.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0317,2026-07-23,35950.00,mascotas,Veterinaria,debito,ARS,,
+demo-0311,2026-07-26,31150.00,salud,Consulta,debito,ARS,,
+demo-0314,2026-07-26,75200.00,ropa,Campera,credito,ARS,,demo-card-visa
+demo-0319,2026-07-28,37600.00,regalos,Cumpleaños,credito,ARS,,demo-card-visa
+demo-0304,2026-07-29,30200.00,comida-afuera,Pizzería,debito,ARS,,
+demo-0315,2026-07-29,26200.00,hogar,Limpieza,efectivo,ARS,,
+demo-0295,2026-07-30,64800.00,supermercado,Supermercado,debito,ARS,,
+demo-0300,2026-07-31,38250.00,supermercado,Supermercado,debito,ARS,,
+demo-0331,2026-08-01,60400.00,supermercado,La Anónima,debito,ARS,,
+demo-0336,2026-08-02,32750.00,supermercado,Carnicería,credito,ARS,,demo-card-visa
+demo-0326,2026-08-03,8366.00,suscripciones,Netflix,credito,USD,4.62,demo-card-visa
+demo-0332,2026-08-03,37400.00,supermercado,Verdulería,debito,ARS,,
+demo-0339,2026-08-03,13500.00,comida-afuera,Almuerzo,debito,ARS,,
+demo-0327,2026-08-04,13473.00,suscripciones,Spotify,credito,USD,7.44,demo-card-visa
+demo-0333,2026-08-04,58800.00,supermercado,Almacén,debito,ARS,,
+demo-0341,2026-08-04,29150.00,comida-afuera,Pizzería,credito,ARS,,demo-card-visa
+demo-0320,2026-08-05,502200.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0328,2026-08-05,18072.00,suscripciones,iCloud,credito,USD,9.98,demo-card-visa
+demo-0347,2026-08-05,14850.00,ocio,Recital,efectivo,ARS,,
+demo-0329,2026-08-06,15247.00,suscripciones,Disney+,credito,USD,8.42,demo-card-visa
+demo-0338,2026-08-06,21200.00,comida-afuera,Almuerzo,debito,ARS,,
+demo-0321,2026-08-10,78350.00,vivienda,Expensas,transferencia,ARS,,
+demo-0322,2026-08-12,32500.00,servicios,Luz,debito,ARS,,
+demo-0337,2026-08-12,33700.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0323,2026-08-13,34050.00,servicios,Gas,debito,ARS,,
+demo-0324,2026-08-14,34050.00,servicios,Internet,debito,ARS,,
+demo-0325,2026-08-15,36600.00,servicios,Celular,debito,ARS,,
+demo-0334,2026-08-15,41550.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0346,2026-08-16,40500.00,salud,Prepaga copago,debito,ARS,,
+demo-0350,2026-08-16,55000.00,mascotas,Veterinaria,debito,ARS,,
+demo-0335,2026-08-18,27700.00,supermercado,La Anónima,debito,ARS,,
+demo-0351,2026-08-18,474568.00,viajes,Escapada de fin de semana,credito,ARS,,demo-card-visa
+demo-0330,2026-08-20,69650.00,educacion,Curso online,credito,ARS,,demo-card-visa
+demo-0343,2026-08-22,28500.00,transporte,Nafta,efectivo,ARS,,
+demo-0349,2026-08-23,25850.00,hogar,Ferretería,efectivo,ARS,,
+demo-0348,2026-08-24,23200.00,hogar,Bazar,efectivo,ARS,,
+demo-0344,2026-08-29,35150.00,transporte,Estacionamiento,debito,ARS,,
+demo-0345,2026-08-29,34400.00,transporte,Remis,debito,ARS,,
+demo-0342,2026-08-30,44250.00,transporte,Remis,debito,ARS,,
+demo-0340,2026-08-31,21650.00,comida-afuera,Cena afuera,debito,ARS,,
+demo-0383,2026-09-01,23600.00,hogar,Ferretería,efectivo,ARS,,
+demo-0364,2026-09-02,38800.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0358,2026-09-03,13123.00,suscripciones,Netflix,credito,USD,7.07,demo-card-visa
+demo-0376,2026-09-03,24100.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0359,2026-09-04,10264.00,suscripciones,Spotify,credito,USD,5.53,demo-card-visa
+demo-0352,2026-09-05,508200.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0360,2026-09-05,7350.00,suscripciones,iCloud,credito,USD,3.96,demo-card-visa
+demo-0361,2026-09-05,55900.00,educacion,Curso online,credito,ARS,,demo-card-visa
+demo-0372,2026-09-06,17000.00,comida-afuera,Almuerzo,credito,ARS,,demo-card-visa
+demo-0385,2026-09-07,22050.00,mascotas,Veterinaria,debito,ARS,,
+demo-0353,2026-09-10,89250.00,vivienda,Expensas,transferencia,ARS,,
+demo-0366,2026-09-10,52150.00,supermercado,Carnicería,debito,ARS,,
+demo-0370,2026-09-10,39950.00,supermercado,Supermercado,debito,ARS,,
+demo-0373,2026-09-10,28250.00,comida-afuera,Café,efectivo,ARS,,
+demo-0378,2026-09-10,20600.00,ocio,Juego,credito,ARS,,demo-card-visa
+demo-0379,2026-09-11,16200.00,ocio,Juego,efectivo,ARS,,
+demo-0354,2026-09-12,36200.00,servicios,Luz,debito,ARS,,
+demo-0377,2026-09-12,51150.00,transporte,Nafta,debito,ARS,,
+demo-0355,2026-09-13,33900.00,servicios,Gas,debito,ARS,,
+demo-0362,2026-09-13,50450.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0363,2026-09-13,60500.00,supermercado,Verdulería,debito,ARS,,
+demo-0356,2026-09-14,33800.00,servicios,Internet,debito,ARS,,
+demo-0357,2026-09-15,38500.00,servicios,Celular,debito,ARS,,
+demo-0374,2026-09-16,27600.00,comida-afuera,Delivery,efectivo,ARS,,
+demo-0375,2026-09-16,15050.00,comida-afuera,Pizzería,debito,ARS,,
+demo-0384,2026-09-16,19300.00,mascotas,Veterinaria,debito,ARS,,
+demo-0382,2026-09-18,19950.00,hogar,Limpieza,debito,ARS,,
+demo-0381,2026-09-21,41700.00,ropa,Ropa,credito,ARS,,demo-card-visa
+demo-0380,2026-09-22,31000.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0365,2026-09-24,61400.00,supermercado,Verdulería,debito,ARS,,
+demo-0369,2026-09-25,70750.00,supermercado,Carnicería,debito,ARS,,
+demo-0368,2026-09-27,50600.00,supermercado,Supermercado,debito,ARS,,
+demo-0367,2026-09-29,69750.00,supermercado,La Anónima,debito,ARS,,
+demo-0371,2026-09-30,28950.00,supermercado,Supermercado,debito,ARS,,
+demo-0396,2026-10-01,72900.00,educacion,Libros técnicos,credito,ARS,,demo-card-visa
+demo-0401,2026-10-02,64100.00,supermercado,Supermercado,debito,ARS,,
+demo-0406,2026-10-02,24850.00,comida-afuera,Pizzería,debito,ARS,,
+demo-0392,2026-10-03,19596.00,suscripciones,Netflix,credito,USD,10.30,demo-card-visa
+demo-0415,2026-10-03,22450.00,salud,Consulta,debito,ARS,,
+demo-0393,2026-10-04,14345.00,suscripciones,Spotify,credito,USD,7.54,demo-card-visa
+demo-0386,2026-10-05,541450.00,vivienda,Alquiler,transferencia,ARS,,
+demo-0394,2026-10-05,10711.00,suscripciones,iCloud,credito,USD,5.63,demo-card-visa
+demo-0397,2026-10-05,57850.00,supermercado,Supermercado,credito,ARS,,demo-card-visa
+demo-0399,2026-10-05,42350.00,supermercado,Almacén,debito,ARS,,
+demo-0408,2026-10-05,34100.00,comida-afuera,Almuerzo,efectivo,ARS,,
+demo-0419,2026-10-05,25450.00,hogar,Ferretería,debito,ARS,,
+demo-0395,2026-10-06,20015.00,suscripciones,Disney+,credito,USD,10.52,demo-card-visa
+demo-0398,2026-10-06,30150.00,supermercado,La Anónima,debito,ARS,,
+demo-0405,2026-10-06,27350.00,supermercado,Almacén,efectivo,ARS,,
+demo-0416,2026-10-06,34950.00,ocio,Cine,credito,ARS,,demo-card-visa
+demo-0402,2026-10-08,52500.00,supermercado,Verdulería,efectivo,ARS,,
+demo-0410,2026-10-09,30950.00,comida-afuera,Café,efectivo,ARS,,
+demo-0387,2026-10-10,90700.00,vivienda,Expensas,transferencia,ARS,,
+demo-0388,2026-10-12,35550.00,servicios,Luz,debito,ARS,,
+demo-0420,2026-10-12,21650.00,hogar,Ferretería,debito,ARS,,
+demo-0389,2026-10-13,39300.00,servicios,Gas,debito,ARS,,
+demo-0421,2026-10-13,48200.00,mascotas,Alimento,debito,ARS,,
+demo-0390,2026-10-14,39200.00,servicios,Internet,debito,ARS,,
+demo-0417,2026-10-14,59100.00,ropa,Zapatillas,credito,ARS,,demo-card-visa
+demo-0391,2026-10-15,38700.00,servicios,Celular,debito,ARS,,
+demo-0404,2026-10-15,28750.00,supermercado,Carnicería,efectivo,ARS,,
+demo-0413,2026-10-18,22350.00,transporte,Nafta,efectivo,ARS,,
+demo-0400,2026-10-20,26350.00,supermercado,La Anónima,efectivo,ARS,,
+demo-0403,2026-10-21,59150.00,supermercado,Supermercado,credito,ARS,,demo-card-visa
+demo-0411,2026-10-21,27900.00,transporte,Estacionamiento,efectivo,ARS,,
+demo-0418,2026-10-21,88200.00,ropa,Zapatillas,credito,ARS,,demo-card-visa
+demo-0409,2026-10-23,26700.00,comida-afuera,Cena afuera,credito,ARS,,demo-card-visa
+demo-0407,2026-10-25,13400.00,comida-afuera,Almuerzo,debito,ARS,,
+demo-0422,2026-10-25,34150.00,regalos,Regalo,credito,ARS,,demo-card-visa
+demo-0412,2026-10-26,52900.00,transporte,Nafta,efectivo,ARS,,
+demo-0414,2026-10-28,32300.00,transporte,Remis,debito,ARS,,

@@ -1,0 +1,108 @@
+{
+  "name": "Cuentas Claras",
+  "dataColors": [
+    "#0088A8",
+    "#E6943A",
+    "#13A06F",
+    "#5B50E6",
+    "#E87BA4",
+    "#EDA100",
+    "#0A5F72",
+    "#C2412D"
+  ],
+  "foreground": "#0C2830",
+  "foregroundNeutralSecondary": "#3B5760",
+  "foregroundNeutralTertiary": "#68818A",
+  "background": "#FFFFFF",
+  "backgroundLight": "#EEF4F5",
+  "backgroundNeutral": "#D5E2E5",
+  "tableAccent": "#0088A8",
+  "good": "#0F7A4A",
+  "neutral": "#68818A",
+  "bad": "#C2412D",
+  "maximum": "#0A5F72",
+  "center": "#5FB3C7",
+  "minimum": "#D8EEF3",
+  "textClasses": {
+    "callout": {
+      "fontSize": 28,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0C2830"
+    },
+    "title": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0C2830"
+    },
+    "header": {
+      "fontSize": 12,
+      "fontFace": "Segoe UI Semibold",
+      "color": "#0C2830"
+    },
+    "label": {
+      "fontSize": 10,
+      "fontFace": "Segoe UI",
+      "color": "#3B5760"
+    }
+  },
+  "visualStyles": {
+    "*": {
+      "*": {
+        "background": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#FFFFFF"
+              }
+            },
+            "transparency": 0
+          }
+        ],
+        "border": [
+          {
+            "show": true,
+            "color": {
+              "solid": {
+                "color": "#D5E2E5"
+              }
+            },
+            "radius": 12
+          }
+        ],
+        "padding": [
+          {
+            "top": 12,
+            "bottom": 12,
+            "left": 14,
+            "right": 14
+          }
+        ],
+        "valueAxis": [
+          {
+            "gridlineColor": {
+              "solid": {
+                "color": "#D5E2E5"
+              }
+            },
+            "gridlineThickness": 1
+          }
+        ]
+      }
+    },
+    "page": {
+      "*": {
+        "background": [
+          {
+            "color": {
+              "solid": {
+                "color": "#EEF4F5"
+              }
+            },
+            "transparency": 0
+          }
+        ]
+      }
+    }
+  }
+}
