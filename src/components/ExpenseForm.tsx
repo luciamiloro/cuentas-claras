@@ -1,13 +1,22 @@
 import { useRef, useState, type FormEvent } from 'react'
-import type { CreditCard, Currency, Expense, MonthKey, NewExpense, PaymentMethod } from '../types'
+import type { Category, CreditCard, Currency, CustomCategory, Expense, MonthKey, NewExpense, PaymentMethod } from '../types'
 import { PAYMENT_METHODS } from '../types'
-import { CATEGORIES } from '../lib/categories'
+import type { CategoryDraft, CategoryLookup } from '../lib/categories'
 import { defaultDateFor } from '../lib/dates'
 import { formatARS, formatUSD, parseAmount } from '../lib/format'
+import { CategoryEditor } from './CategoryEditor'
 
 interface Props {
   month: MonthKey
   editing: Expense | null
+  /** Categorías para elegir (fábrica + propias activas) */
+  categories: Category[]
+  /** Resuelve cualquier id, archivadas incluidas */
+  getCategory: CategoryLookup
+  /** Propias (para validar duplicados al crear) */
+  customCategories: CustomCategory[]
+  /** Crea una categoría; devuelve la nueva o null si falló */
+  onCreateCategory: (draft: CategoryDraft) => Promise<Category | null>
   cards: CreditCard[]
   /** Cotización sugerida para gastos en dólares (dólar tarjeta) */
   usdCardRate: number | null
@@ -26,7 +35,21 @@ const toInput = (n: number) => String(n).replace('.', ',')
  * El padre monta el form con `key={editing?.id ?? 'new'}`, así que el estado
  * inicial sale directo de las props (sin efectos para sincronizar).
  */
-export function ExpenseForm({ month, editing, cards, usdCardRate, onSubmit, onCancelEdit, onSaved, onAddCard, onClose }: Props) {
+export function ExpenseForm({
+  month,
+  editing,
+  categories,
+  getCategory,
+  customCategories,
+  onCreateCategory,
+  cards,
+  usdCardRate,
+  onSubmit,
+  onCancelEdit,
+  onSaved,
+  onAddCard,
+  onClose,
+}: Props) {
   const editingUsd = editing?.currency === 'USD'
   const [currency, setCurrency] = useState<Currency>(editing?.currency ?? 'ARS')
   const [amount, setAmount] = useState(() =>
@@ -43,7 +66,25 @@ export function ExpenseForm({ month, editing, cards, usdCardRate, onSubmit, onCa
   const [cardId, setCardId] = useState(editing?.cardId ?? cards[0]?.id ?? '')
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const [creatingCategory, setCreatingCategory] = useState(false)
   const amountRef = useRef<HTMLInputElement>(null)
+
+  // Si el gasto que se edita tiene una categoría archivada, la mostramos igual
+  // para que la selección no quede invisible.
+  // Si la elegida se borró mientras tanto, se descarta la selección.
+  const isActive = categories.some((c) => c.id === categoryId)
+  const isKnown =
+    isActive || customCategories.some((c) => c.id === categoryId) || (!!editing && editing.categoryId === categoryId)
+  const selectedId = isKnown ? categoryId : ''
+  const archivedSelected = selectedId && !isActive ? getCategory(selectedId) : null
+
+  async function createCategory(draft: CategoryDraft) {
+    const created = await onCreateCategory(draft)
+    if (!created) return false
+    setCategoryId(created.id)
+    setCreatingCategory(false)
+    return true
+  }
 
   // Si cambia el mes que se está mirando, la fecha sugerida lo acompaña
   // (patrón "ajustar estado durante el render", sin useEffect).
@@ -69,7 +110,7 @@ export function ExpenseForm({ month, editing, cards, usdCardRate, onSubmit, onCa
     ev.preventDefault()
     if (!Number.isFinite(parsed) || parsed <= 0) return setError('Poné un monto mayor a cero.')
     if (isUsd && (!Number.isFinite(parsedRate) || parsedRate <= 0)) return setError('Poné la cotización del dólar para pasarlo a pesos.')
-    if (!categoryId) return setError('Elegí una categoría.')
+    if (!selectedId) return setError('Elegí una categoría.')
     if (!date) return setError('Falta la fecha.')
     setError(null)
     setSaving(true)
@@ -79,7 +120,7 @@ export function ExpenseForm({ month, editing, cards, usdCardRate, onSubmit, onCa
         currency,
         originalAmount: isUsd ? Math.round(parsed * 100) / 100 : null,
         cardId: paymentMethod === 'credito' && validCard ? validCard : null,
-        categoryId,
+        categoryId: selectedId,
         date,
         description: description.trim(),
         paymentMethod,
@@ -165,19 +206,44 @@ export function ExpenseForm({ month, editing, cards, usdCardRate, onSubmit, onCa
       <fieldset className="field">
         <legend className="field-label">Categoría</legend>
         <div className="chips" role="radiogroup">
-          {CATEGORIES.map((c) => (
+          {categories.map((c) => (
             <button
               type="button"
               key={c.id}
               role="radio"
-              aria-checked={categoryId === c.id}
-              className={`chip ${categoryId === c.id ? 'is-on' : ''}`}
+              aria-checked={selectedId === c.id}
+              className={`chip ${selectedId === c.id ? 'is-on' : ''}`}
               onClick={() => setCategoryId(c.id)}
             >
               <span aria-hidden>{c.emoji}</span> {c.name}
             </button>
           ))}
+          {archivedSelected && (
+            <button type="button" role="radio" aria-checked className="chip is-on">
+              <span aria-hidden>{archivedSelected.emoji}</span> {archivedSelected.name}{' '}
+              <span className="chip-note">(archivada)</span>
+            </button>
+          )}
+          {!creatingCategory && (
+            <button
+              type="button"
+              className="chip chip-add"
+              onClick={() => setCreatingCategory(true)}
+              aria-label="Nueva categoría"
+            >
+              + Nueva
+            </button>
+          )}
         </div>
+        {creatingCategory && (
+          <CategoryEditor
+            existing={customCategories}
+            title="Nueva categoría"
+            saveLabel="Crear y elegir"
+            onSave={createCategory}
+            onCancel={() => setCreatingCategory(false)}
+          />
+        )}
       </fieldset>
 
       <div className="row-2">

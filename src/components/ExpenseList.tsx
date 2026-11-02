@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import type { Expense } from '../types'
 import { PAYMENT_METHODS } from '../types'
-import { getCategory } from '../lib/categories'
+import type { CategoryLookup } from '../lib/categories'
 import { dayLabel, formatARS, formatUSD } from '../lib/format'
 
 interface Props {
   expenses: Expense[]
+  /** Resuelve categorías de fábrica y propias (archivadas incluidas) */
+  getCategory: CategoryLookup
   categoryFilter: string | null
   onClearFilter: () => void
   onEdit: (e: Expense) => void
@@ -15,7 +17,7 @@ interface Props {
 
 const methodLabel = new Map(PAYMENT_METHODS.map((m) => [m.id, m.label]))
 
-export function ExpenseList({ expenses, categoryFilter, onClearFilter, onEdit, onDelete, editingId }: Props) {
+export function ExpenseList({ expenses, getCategory, categoryFilter, onClearFilter, onEdit, onDelete, editingId }: Props) {
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
   const LIMIT = 12
@@ -26,7 +28,7 @@ export function ExpenseList({ expenses, categoryFilter, onClearFilter, onEdit, o
       .filter((e) => !categoryFilter || e.categoryId === categoryFilter)
       .filter((e) => !q || e.description.toLowerCase().includes(q) || getCategory(e.categoryId).name.toLowerCase().includes(q))
       .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
-  }, [expenses, categoryFilter, query])
+  }, [expenses, categoryFilter, query, getCategory])
 
   const visibleTotal = visible.reduce((a, e) => a + e.amount, 0)
   const filterCat = categoryFilter ? getCategory(categoryFilter) : null

@@ -34,6 +34,8 @@ alter table public.user_settings add column if not exists usd_card_rate numeric(
 alter table public.user_settings add column if not exists usd_mep_rate numeric(14, 2);
 alter table public.user_settings add column if not exists cards jsonb not null default '[]'::jsonb;
 alter table public.user_settings add column if not exists savings jsonb not null default '[]'::jsonb;
+-- Categorías propias: [{ id, name, emoji, kind: 'fijo'|'variable', archived }]
+alter table public.user_settings add column if not exists categories jsonb not null default '[]'::jsonb;
 
 -- ------------------------------------------------------------
 -- Row Level Security: cada usuario ve y modifica SÓLO lo suyo.
@@ -89,6 +91,8 @@ create policy "categories: lectura" on public.categories for select to authentic
 
 -- Vista para Power BI (se consulta con un usuario de base de datos,
 -- no con la anon key; ver docs/setup.md, paso 6).
+-- categoria / tipo salen de la tabla de fábrica o de las categorías propias del usuario.
+-- (Columnas nuevas siempre al final: "create or replace view" no permite insertarlas en el medio.)
 create or replace view public.bi_gastos as
 select
   e.id,
@@ -101,11 +105,15 @@ select
   e.payment_method as medio_pago,
   e.currency       as moneda,
   e.original_amount as monto_original,
-  card.value ->> 'name' as tarjeta
+  card.value ->> 'name' as tarjeta,
+  coalesce(cat.categoria, cc.value ->> 'name', e.category_id) as categoria,
+  coalesce(cat.tipo, cc.value ->> 'kind', 'variable')         as tipo
 from public.expenses e
 join auth.users u on u.id = e.user_id
 left join public.user_settings s on s.user_id = e.user_id
-left join lateral jsonb_array_elements(s.cards) card on card.value ->> 'id' = e.card_id;
+left join lateral jsonb_array_elements(s.cards) card on card.value ->> 'id' = e.card_id
+left join public.categories cat on cat.categoria_id = e.category_id
+left join lateral jsonb_array_elements(s.categories) cc on cc.value ->> 'id' = e.category_id;
 
 -- Saldos de ahorro en formato tabla (una fila por carga de saldo)
 create or replace view public.bi_ahorros as

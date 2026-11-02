@@ -119,7 +119,7 @@ export class SupabaseRepository implements ExpenseRepository {
   async getSettings(): Promise<Settings> {
     const { data, error } = await this.db
       .from('user_settings')
-      .select('monthly_budget, usd_card_rate, usd_mep_rate, cards, savings')
+      .select('monthly_budget, usd_card_rate, usd_mep_rate, cards, savings, categories')
       .eq('user_id', this.userId)
       .maybeSingle()
     if (error) throw error
@@ -129,6 +129,7 @@ export class SupabaseRepository implements ExpenseRepository {
       usdMepRate: data?.usd_mep_rate,
       cards: data?.cards,
       savings: data?.savings,
+      categories: data?.categories,
     })
   }
 
@@ -142,6 +143,7 @@ export class SupabaseRepository implements ExpenseRepository {
         usd_mep_rate: settings.usdMepRate,
         cards: settings.cards,
         savings: settings.savings,
+        categories: settings.categories,
         updated_at: new Date().toISOString(),
       })
     if (error) throw error

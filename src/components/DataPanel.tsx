@@ -1,18 +1,32 @@
 import { useRef, useState } from 'react'
-import type { Expense } from '../types'
-import { CATEGORIES } from '../lib/categories'
+import type { Category, CustomCategory, Expense } from '../types'
 import { categoriesToCsv, downloadText, expensesToCsv } from '../lib/csv'
+import { normalizeCategories } from '../lib/settings'
 import { isExpense } from '../data/repository'
 import { todayISO } from '../lib/dates'
 
 interface Props {
   expenses: Expense[]
+  /** Fábrica + propias (archivadas incluidas), para el CSV de Power BI */
+  categories: Category[]
+  /** Propias, para incluirlas en el backup */
+  customCategories: CustomCategory[]
+  /** Suma al usuario las categorías de un backup que todavía no tenga */
+  onImportCategories: (list: CustomCategory[]) => Promise<void>
   onReplaceAll: (list: Expense[]) => Promise<void>
   onLoadDemo?: () => void
   storageLabel: string
 }
 
-export function DataPanel({ expenses, onReplaceAll, onLoadDemo, storageLabel }: Props) {
+export function DataPanel({
+  expenses,
+  categories,
+  customCategories,
+  onImportCategories,
+  onReplaceAll,
+  onLoadDemo,
+  storageLabel,
+}: Props) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [msg, setMsg] = useState<string | null>(null)
   const [confirmWipe, setConfirmWipe] = useState(false)
@@ -24,12 +38,12 @@ export function DataPanel({ expenses, onReplaceAll, onLoadDemo, storageLabel }: 
 
   function exportPowerBI() {
     downloadText('gastos.csv', expensesToCsv(expenses))
-    setTimeout(() => downloadText('categorias.csv', categoriesToCsv(CATEGORIES)), 300)
+    setTimeout(() => downloadText('categorias.csv', categoriesToCsv(categories)), 300)
     say('Descargados gastos.csv y categorias.csv — ponelos en la carpeta que lee Power BI.')
   }
 
   function exportBackup() {
-    downloadText(`cuentas-claras-backup-${todayISO()}.json`, JSON.stringify({ version: 1, expenses }, null, 2), 'application/json')
+    downloadText(`cuentas-claras-backup-${todayISO()}.json`, JSON.stringify({ version: 2, expenses, categories: customCategories }, null, 2), 'application/json')
   }
 
   async function importBackup(file: File) {
@@ -38,6 +52,9 @@ export function DataPanel({ expenses, onReplaceAll, onLoadDemo, storageLabel }: 
       const list = Array.isArray(data) ? data : data?.expenses
       if (!Array.isArray(list)) throw new Error()
       const valid = list.filter(isExpense)
+      // Primero las categorías propias, así los gastos importados no quedan con "❔"
+      const cats = Array.isArray(data) ? [] : normalizeCategories(data?.categories)
+      if (cats.length) await onImportCategories(cats)
       await onReplaceAll(valid)
       say(`Importados ${valid.length} gastos${valid.length < list.length ? ` (${list.length - valid.length} filas inválidas ignoradas)` : ''}.`)
     } catch {

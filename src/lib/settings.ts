@@ -1,5 +1,6 @@
-import type { BalanceEntry, CreditCard, SavingsAccount, Settings } from '../types'
+import type { BalanceEntry, CreditCard, CustomCategory, SavingsAccount, Settings } from '../types'
 import { DEFAULT_SETTINGS } from '../types'
+import { DEFAULT_CUSTOM_EMOJI, FACTORY_IDS, cleanName, firstGrapheme } from './categories'
 
 const num = (v: unknown): number | null => {
   const n = typeof v === 'string' ? Number(v) : v
@@ -48,6 +49,35 @@ function normalizeAccount(x: unknown): SavingsAccount | null {
   }
 }
 
+export function normalizeCategory(x: unknown): CustomCategory | null {
+  if (!x || typeof x !== 'object') return null
+  const c = x as Record<string, unknown>
+  if (typeof c.id !== 'string' || !c.id || typeof c.name !== 'string') return null
+  const name = cleanName(c.name)
+  if (!name) return null
+  return {
+    id: c.id,
+    name,
+    emoji: (typeof c.emoji === 'string' && firstGrapheme(c.emoji)) || DEFAULT_CUSTOM_EMOJI,
+    kind: c.kind === 'fijo' ? 'fijo' : 'variable',
+    archived: c.archived === true,
+  }
+}
+
+/** Normaliza una lista de categorías propias: descarta inválidas, ids repetidos y los que pisan a las de fábrica. */
+export function normalizeCategories(raw: unknown): CustomCategory[] {
+  if (!Array.isArray(raw)) return []
+  const seen = new Set<string>()
+  const out: CustomCategory[] = []
+  for (const item of raw) {
+    const c = normalizeCategory(item)
+    if (!c || seen.has(c.id) || FACTORY_IDS.has(c.id)) continue
+    seen.add(c.id)
+    out.push(c)
+  }
+  return out
+}
+
 /** Acepta lo que venga del almacenamiento (versiones viejas incluidas) y devuelve Settings válido. */
 export function normalizeSettings(raw: unknown): Settings {
   if (!raw || typeof raw !== 'object') return { ...DEFAULT_SETTINGS }
@@ -60,6 +90,7 @@ export function normalizeSettings(raw: unknown): Settings {
     savings: Array.isArray(r.savings)
       ? r.savings.map(normalizeAccount).filter((a): a is SavingsAccount => a !== null)
       : [],
+    categories: normalizeCategories(r.categories),
   }
 }
 

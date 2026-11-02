@@ -16,6 +16,11 @@ export interface Category {
   kind: CategoryKind
 }
 
+/** Categoría creada por el usuario. Archivada: no se ofrece al cargar, pero los gastos viejos la conservan. */
+export interface CustomCategory extends Category {
+  archived: boolean
+}
+
 export type Currency = 'ARS' | 'USD'
 
 export interface Expense {
@@ -83,6 +88,8 @@ export interface Settings {
   usdMepRate: number | null
   cards: CreditCard[]
   savings: SavingsAccount[]
+  /** Categorías propias (se suman a las de fábrica) */
+  categories: CustomCategory[]
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -91,4 +98,5 @@ export const DEFAULT_SETTINGS: Settings = {
   usdMepRate: null,
   cards: [],
   savings: [],
+  categories: [],
 }

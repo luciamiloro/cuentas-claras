@@ -1,5 +1,5 @@
 import type { Category, Expense, MonthKey } from '../types'
-import { getCategory } from './categories'
+import { getCategory, type CategoryLookup } from './categories'
 import { currentMonth, daysInMonth, monthOf, monthRange, shiftMonth } from './dates'
 
 export function expensesInMonth(expenses: Expense[], month: MonthKey): Expense[] {
@@ -17,7 +17,7 @@ export interface CategoryTotal {
 }
 
 /** Totales por categoría del mes, ordenados de mayor a menor. */
-export function totalsByCategory(expenses: Expense[], month: MonthKey): CategoryTotal[] {
+export function totalsByCategory(expenses: Expense[], month: MonthKey, lookup: CategoryLookup = getCategory): CategoryTotal[] {
   const current = expensesInMonth(expenses, month)
   const prev = expensesInMonth(expenses, shiftMonth(month, -1))
   const total = sum(current)
@@ -34,7 +34,7 @@ export function totalsByCategory(expenses: Expense[], month: MonthKey): Category
 
   return [...acc.entries()]
     .map(([id, r]) => ({
-      category: getCategory(id),
+      category: lookup(id),
       total: r.total,
       count: r.count,
       share: total > 0 ? r.total / total : 0,
@@ -69,16 +69,21 @@ export interface MonthSummary {
   top: CategoryTotal | null
 }
 
-export function summarize(expenses: Expense[], month: MonthKey, now = new Date()): MonthSummary {
+export function summarize(
+  expenses: Expense[],
+  month: MonthKey,
+  lookup: CategoryLookup = getCategory,
+  now = new Date(),
+): MonthSummary {
   const current = expensesInMonth(expenses, month)
   const total = sum(current)
   const previousTotal = sum(expensesInMonth(expenses, shiftMonth(month, -1)))
   const isCurrent = month === currentMonth(now)
   const days = isCurrent ? now.getDate() : daysInMonth(month)
-  const byCat = totalsByCategory(expenses, month)
+  const byCat = totalsByCategory(expenses, month, lookup)
 
   let fixed = 0
-  for (const e of current) if (getCategory(e.categoryId).kind === 'fijo') fixed += e.amount
+  for (const e of current) if (lookup(e.categoryId).kind === 'fijo') fixed += e.amount
 
   return {
     total,

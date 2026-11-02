@@ -35,6 +35,7 @@ App web para **registrar gastos mensuales y ver en qué categoría se va la plat
 **Gastos**
 
 - **Carga rápida**: monto en pesos o dólares (acepta `12.500,50`), categoría con un toque, fecha, medio de pago y tarjeta.
+- **Categorías propias**: creá las tuyas desde el formulario (emoji, nombre y fijo/variable), editalas y archivalas en "Tus categorías"; los gastos viejos conservan nombre y emoji.
 - **Resumen del mes**: total, variación vs. mes anterior, promedio diario (hasta hoy en el mes en curso), categoría principal y split fijos/variables.
 - **Ranking por categoría** con % del total y variación por categoría. Tocar una categoría filtra los movimientos.
 - **Tendencia de 6 meses** con línea de promedio; tocar una barra navega a ese mes.
@@ -78,6 +79,7 @@ src/
 │   └── categories.ts
 └── components/              # Login, Gastos (KPIs, ranking, tendencia), Tarjetas, Ahorros
 supabase/schema.sql          # Tablas, políticas RLS y vistas para Power BI
+supabase/migrations-categorias.sql # Para proyectos existentes: columna de categorías propias + bi_gastos nueva
 ```
 
 Decisiones:
@@ -118,7 +120,7 @@ En [`powerbi/`](powerbi/README.md): consultas de Power Query, tabla calendario, 
 - [x] Avisos de vencimiento de tarjetas con consumos en USD
 - [x] Seguimiento de ahorros en ARS/USD
 - [ ] Avisos por mail aunque no abras la app (Supabase Edge Function + cron)
-- [ ] Categorías personalizables
+- [x] Categorías personalizables
 - [ ] Gastos recurrentes (alquiler, servicios) que se cargan solos cada mes
 - [ ] Tests de `lib/` con Vitest
 - [ ] PWA instalable en el celular

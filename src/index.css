@@ -751,6 +751,60 @@ select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-w
 .push-right { margin-left: auto; }
 .row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
 @media (max-width: 520px) { .row-3 { grid-template-columns: 1fr 1fr; } }
+/* ---------- categorías propias ---------- */
+.chip-add {
+  border-style: dashed;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+}
+.chip-add:hover { border-color: var(--primary); }
+.chip-note { opacity: 0.75; font-size: 12px; }
+
+.cat-editor { margin: 10px 0 0; gap: 10px; }
+.form .cat-editor { margin-bottom: 0; }
+.cat-editor-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: end; }
+.emoji-input { width: 56px; text-align: center; font-size: 20px; padding: 5px 4px; }
+.field-label .count { float: right; font-weight: 500; color: var(--muted); font-variant-numeric: tabular-nums; }
+.cat-name-field .field-label { display: block; }
+.emoji-picks { display: flex; flex-wrap: wrap; gap: 4px; }
+.emoji-picks button {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--surface);
+  cursor: pointer;
+}
+.emoji-picks button:hover { border-color: var(--axis); }
+.emoji-picks button.is-on { border-color: var(--primary); box-shadow: inset 0 0 0 1px var(--primary); }
+.cat-kind { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+.cat-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cat-list > li + li { border-top: 1px solid var(--line); }
+.cat-list .cat-editor { margin: 8px 0; }
+.cat-row { display: flex; align-items: center; gap: 12px; padding: 10px 2px; flex-wrap: wrap; }
+.cat-emoji {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  flex: none;
+}
+.cat-info { display: flex; flex-direction: column; min-width: 0; flex: 1 1 160px; }
+.cat-info strong { overflow-wrap: anywhere; }
+.cat-meta { font-size: 12px; color: var(--muted); }
+.cat-actions { display: flex; gap: 14px; align-items: center; margin-left: auto; }
+.cat-row.is-archived .cat-emoji { opacity: 0.6; }
+.cat-row.is-archived .cat-info strong { color: var(--ink-2); }
+.cat-archived { margin-top: 10px; }
+
 .check { display: flex; gap: 8px; align-items: center; font-size: 14px; }
 .check input { width: auto; }
 
@@ -959,7 +1013,20 @@ h2 { text-wrap: balance; }
   .toast { bottom: calc(150px + env(safe-area-inset-bottom, 0px)); }
   .kpi.hero .kpi-value { font-size: 36px; }
 }
-body.no-scroll { overflow: hidden; }
+   /* Bloquear el scroll de fondo sólo cuando la hoja del celu está abierta (en PC no aplica) */
+   @media (max-width: 860px) {
+     body.no-scroll { overflow: hidden; }
+   }
+
+   /* En PC el formulario queda fijo al costado: si es más alto que la pantalla, scrollea por dentro */
+   @media (min-width: 861px) {
+     .col-side {
+       max-height: calc(100dvh - 32px);
+       overflow-y: auto;
+       overscroll-behavior: contain;
+       scrollbar-width: thin;
+     }
+   }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; }

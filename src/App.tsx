@@ -19,9 +19,12 @@ import { TabIcon } from './components/TabIcon'
 import { CardsView } from './components/CardsView'
 import { CardAlerts } from './components/CardAlerts'
 import { SavingsView } from './components/SavingsView'
+import { CategoriesManager } from './components/CategoriesManager'
 import { statementFor } from './lib/cards'
 import { fetchRate } from './lib/rates'
-import type { Settings } from './types'
+import { buildCatalog, mergeCategories, type CategoryDraft } from './lib/categories'
+import { newId } from './lib/settings'
+import type { CustomCategory, Settings } from './types'
 
 export type Account =
   | { kind: 'local' }
@@ -136,10 +139,72 @@ export default function App({ repo, account }: Props) {
     toastTimer.current = window.setTimeout(() => setToast(null), action ? 6000 : 2400)
   }
 
+  // ---- Categorías propias ----
+  const catalog = useMemo(() => buildCatalog(settings.categories), [settings.categories])
+  // Último settings guardado: el "Deshacer" corre segundos después y no tiene que pisar cambios hechos mientras tanto
+  const settingsRef = useRef(settings)
+  useEffect(() => {
+    settingsRef.current = settings
+  }, [settings])
+
+  async function saveCategories(
+    next: (prev: CustomCategory[]) => CustomCategory[],
+    okMessage?: string,
+    action?: { label: string; run: () => void },
+  ) {
+    const current = settingsRef.current
+    try {
+      const updated = { ...current, categories: next(current.categories) }
+      await saveSettings(updated)
+      settingsRef.current = updated
+      if (okMessage) notify(okMessage, action)
+      return true
+    } catch {
+      notify('No se pudo guardar. Revisá tu conexión y probá de nuevo.')
+      return false
+    }
+  }
+
+  async function createCategory(draft: CategoryDraft) {
+    const created: CustomCategory = { id: newId(), ...draft, archived: false }
+    const ok = await saveCategories((prev) => [...prev, created], `Categoría "${created.name}" creada`)
+    return ok ? created : null
+  }
+
+  const setArchived = (id: string, archived: boolean) => (prev: CustomCategory[]) =>
+    prev.map((c) => (c.id === id ? { ...c, archived } : c))
+
+  function restoreCategory(id: string) {
+    saveCategories(setArchived(id, false), 'Categoría reactivada')
+  }
+
+  /** Con gastos se archiva (los gastos viejos la conservan); sin gastos se borra. Ambas con Deshacer. */
+  function removeCategory(id: string) {
+    const index = settings.categories.findIndex((c) => c.id === id)
+    const cat = settings.categories[index]
+    if (!cat) return
+    if (expenses.some((e) => e.categoryId === id)) {
+      saveCategories(setArchived(id, true), `"${cat.name}" archivada`, {
+        label: 'Deshacer',
+        run: () => restoreCategory(id),
+      })
+    } else {
+      saveCategories((prev) => prev.filter((c) => c.id !== id), `"${cat.name}" borrada`, {
+        label: 'Deshacer',
+        run: () => {
+          saveCategories(
+            (prev) => (prev.some((c) => c.id === id) ? prev : [...prev.slice(0, index), cat, ...prev.slice(index)]),
+            'Categoría recuperada',
+          )
+        },
+      })
+    }
+  }
+
   const thisMonth = currentMonth()
   const monthExpenses = useMemo(() => expensesInMonth(expenses, month), [expenses, month])
-  const summary = useMemo(() => summarize(expenses, month), [expenses, month])
-  const byCategory = useMemo(() => totalsByCategory(expenses, month), [expenses, month])
+  const summary = useMemo(() => summarize(expenses, month, catalog.get), [expenses, month, catalog])
+  const byCategory = useMemo(() => totalsByCategory(expenses, month, catalog.get), [expenses, month, catalog])
   const trendEnd = month > thisMonth ? month : thisMonth
   const trend = useMemo(() => monthlyTotals(expenses, trendEnd, 6), [expenses, trendEnd])
 
@@ -218,6 +283,14 @@ export default function App({ repo, account }: Props) {
   async function migrateLocal() {
     setMigrating(true)
     try {
+      // Primero las categorías propias del navegador, así los gastos subidos no quedan con "❔"
+      const localCats = (await localRepo?.getSettings())?.categories ?? []
+      if (localCats.length) {
+        const current = settingsRef.current
+        const updated = { ...current, categories: mergeCategories(current.categories, localCats) }
+        await saveSettings(updated)
+        settingsRef.current = updated
+      }
       await (repo as SupabaseRepository).insertMany(pendingLocal)
       await localRepo?.replaceAll([])
       notify(`Subidos ${pendingLocal.length} gastos a tu cuenta`)
@@ -355,6 +428,10 @@ export default function App({ repo, account }: Props) {
               <ExpenseForm
                 key={editing?.id ?? 'new'}
                 month={month}
+                categories={catalog.active}
+                getCategory={catalog.get}
+                customCategories={settings.categories}
+                onCreateCategory={createCategory}
                 cards={settings.cards}
                 usdCardRate={usdCardRate}
                 onAddCard={() => setTab('tarjetas')}
@@ -379,6 +456,7 @@ export default function App({ repo, account }: Props) {
 
           <ExpenseList
             expenses={monthExpenses}
+            getCategory={catalog.get}
             categoryFilter={categoryFilter}
             onClearFilter={() => setCategoryFilter(null)}
             onEdit={(e) => {
@@ -390,8 +468,24 @@ export default function App({ repo, account }: Props) {
             editingId={editing?.id ?? null}
           />
 
+          <CategoriesManager
+            categories={settings.categories}
+            expenses={expenses}
+            onCreate={async (d) => (await createCategory(d)) !== null}
+            onUpdate={(id, d) =>
+              saveCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...d } : c)), 'Categoría actualizada')
+            }
+            onRemove={removeCategory}
+            onRestore={restoreCategory}
+          />
+
           <DataPanel
             expenses={expenses}
+            categories={catalog.all}
+            customCategories={settings.categories}
+            onImportCategories={async (list) => {
+              if (!(await saveCategories((prev) => mergeCategories(prev, list)))) throw new Error('No se pudieron importar las categorías')
+            }}
             onReplaceAll={replaceAll}
             onLoadDemo={isCloud ? undefined : loadDemo}
             storageLabel={isCloud ? 'Guardados en tu cuenta' : 'Se guardan en este navegador'}
