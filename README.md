@@ -128,4 +128,4 @@ En [`powerbi/`](powerbi/README.md): consultas de Power Query, tabla calendario, 
 
 ---
 
-Hecho por **Lucía Miloro** — [LinkedIn](#) · [GitHub](#)
+Hecho por **Lucía Miloro** — [LinkedIn](https://www.linkedin.com/in/lucia-miloro/) · [GitHub](https://github.com/luciamiloro)
