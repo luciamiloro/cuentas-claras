@@ -1,8 +1,48 @@
 import type { Category, Expense, MonthKey } from '../types'
 import { getCategory, type CategoryLookup } from './categories'
+import { installmentAmount, installmentsOf } from './cards'
 import { currentMonth, daysInMonth, monthOf, monthRange, shiftMonth } from './dates'
 
-export function expensesInMonth(expenses: Expense[], month: MonthKey): Expense[] {
+/** Un movimiento tal como cuenta en un mes: el gasto entero o una de sus cuotas. */
+export interface LedgerEntry extends Expense {
+  /** Sólo en compras en cuotas: qué cuota es y de qué gasto sale */
+  installment?: { number: number; of: number; total: number; sourceId: string; sourceDate: string }
+}
+
+/** Misma fecha `k` meses después (si el mes es más corto, el último día). */
+function addMonths(date: string, k: number): string {
+  const m = shiftMonth(monthOf(date), k)
+  const day = Math.min(Number(date.slice(8, 10)), daysInMonth(m))
+  return `${m}-${String(day).padStart(2, '0')}`
+}
+
+/**
+ * Reparte las compras en cuotas: una de $20.000 en 4 cuotas hecha en noviembre
+ * cuenta $5.000 en noviembre (1/4), diciembre (2/4), enero (3/4) y febrero (4/4).
+ * Los gastos en un pago quedan igual. Todas las estadísticas del mes usan esto.
+ */
+export function spreadInstallments(expenses: Expense[]): LedgerEntry[] {
+  const out: LedgerEntry[] = []
+  for (const e of expenses) {
+    const n = installmentsOf(e)
+    if (n <= 1) {
+      out.push(e)
+      continue
+    }
+    for (let k = 0; k < n; k++) {
+      out.push({
+        ...e,
+        id: `${e.id}#${k + 1}`,
+        date: addMonths(e.date, k),
+        amount: installmentAmount(e.amount, n, k),
+        installment: { number: k + 1, of: n, total: e.amount, sourceId: e.id, sourceDate: e.date },
+      })
+    }
+  }
+  return out
+}
+
+export function expensesInMonth<T extends Expense>(expenses: T[], month: MonthKey): T[] {
   return expenses.filter((e) => monthOf(e.date) === month)
 }
 

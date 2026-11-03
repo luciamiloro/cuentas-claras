@@ -39,6 +39,12 @@ export function dayLabel(iso: string): string {
   return date.toLocaleDateString('es-AR', { weekday: 'short', day: 'numeric' })
 }
 
+/** "25 nov" */
+export function shortDate(iso: string): string {
+  const [y, m, d] = iso.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }).replace('.', '')
+}
+
 /**
  * Acepta formatos argentinos y anglos: "12.500", "12.500,50", "12500.5", "$ 3.000".
  * Devuelve NaN si no es un número válido.

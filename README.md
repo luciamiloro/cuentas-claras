@@ -25,6 +25,7 @@ App web para **registrar gastos mensuales y ver en qué categoría se va la plat
 **Tarjetas de crédito**
 - Cargás cierre, vencimiento y si tiene débito automático.
 - Calcula qué compras entran en el resumen y cuánto hay **en dólares**.
+- **Compras en cuotas**: cada cuota cae en su resumen, y ves cuánto tenés ya comprometido en cada mes.
 - Avisa X días antes del vencimiento: "pagá los USD antes del débito automático".
 - Crea un recordatorio mensual en Google Calendar.
 

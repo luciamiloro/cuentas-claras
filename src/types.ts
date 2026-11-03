@@ -39,6 +39,8 @@ export interface Expense {
   originalAmount?: number | null
   /** Tarjeta usada, si paymentMethod es 'credito' */
   cardId?: string | null
+  /** Cuotas (sólo crédito en pesos). Si falta o es 1, es en un pago. `amount` es siempre el total. */
+  installments?: number | null
 }
 
 export type NewExpense = Omit<Expense, 'id' | 'createdAt'>

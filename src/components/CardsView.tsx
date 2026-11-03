@@ -1,12 +1,14 @@
 import { useState, type FormEvent } from 'react'
 import type { CreditCard, Expense } from '../types'
-import { googleCalendarLink, statementFor, type StatementSummary } from '../lib/cards'
-import { formatARS, formatUSD, parseAmount } from '../lib/format'
+import { cardOverview, googleCalendarLink, type CardOverview, type StatementDetail } from '../lib/cards'
+import type { CategoryLookup } from '../lib/categories'
+import { formatARS, formatUSD, monthLabel, parseAmount, shortDate } from '../lib/format'
 import { newId } from '../lib/settings'
 
 interface Props {
   cards: CreditCard[]
   expenses: Expense[]
+  getCategory: CategoryLookup
   usdCardRate: number | null
   usdCardRateSource: 'api' | 'manual' | null
   onSaveCards: (cards: CreditCard[]) => Promise<boolean>
@@ -17,14 +19,10 @@ const longDate = (iso: string) => {
   const [y, m, d] = iso.split('-').map(Number)
   return new Date(y, m - 1, d).toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' })
 }
-const shortDate = (iso: string) => {
-  const [y, m, d] = iso.split('-').map(Number)
-  return new Date(y, m - 1, d).toLocaleDateString('es-AR', { day: 'numeric', month: 'short' })
-}
-
-export function CardsView({ cards, expenses, usdCardRate, usdCardRateSource, onSaveCards, onSaveManualRate }: Props) {
+export function CardsView({ cards, expenses, getCategory, usdCardRate, usdCardRateSource, onSaveCards, onSaveManualRate }: Props) {
   const [editing, setEditing] = useState<CreditCard | 'new' | null>(cards.length ? null : 'new')
-  const statements = cards.map((c) => statementFor(c, expenses))
+  const overviews = cards.map((c) => cardOverview(c, expenses))
+  const unassigned = expenses.filter((e) => e.paymentMethod === 'credito' && !cards.some((c) => c.id === e.cardId)).length
 
   async function save(card: CreditCard) {
     const exists = cards.some((c) => c.id === card.id)
@@ -62,12 +60,27 @@ export function CardsView({ cards, expenses, usdCardRate, usdCardRateSource, onS
           />
         )}
 
-        {statements.length > 0 && (
+        <Commitments overviews={overviews} />
+
+        {overviews.length > 0 && (
           <ul className="card-list">
-            {statements.map((s) => (
-              <CardRow key={s.card.id} s={s} usdCardRate={usdCardRate} onEdit={() => setEditing(s.card)} />
+            {overviews.map((o) => (
+              <CardRow
+                key={o.card.id}
+                o={o}
+                getCategory={getCategory}
+                usdCardRate={usdCardRate}
+                onEdit={() => setEditing(o.card)}
+              />
             ))}
           </ul>
+        )}
+
+        {cards.length > 0 && unassigned > 0 && (
+          <p className="footnote">
+            Tenés {unassigned} {unassigned === 1 ? 'gasto' : 'gastos'} con crédito sin tarjeta asignada: no entran en ningún
+            resumen. Editalos desde Movimientos (figuran como "Crédito · sin tarjeta").
+          </p>
         )}
       </section>
 
@@ -85,14 +98,74 @@ export function CardsView({ cards, expenses, usdCardRate, usdCardRateSource, onS
   )
 }
 
-function CardRow({ s, usdCardRate, onEdit }: { s: StatementSummary; usdCardRate: number | null; onEdit: () => void }) {
-  const { card, cycle } = s
-  const urgent = s.shouldAlert
-  const status = cycle.isClosed
-    ? cycle.daysToDue === 0
+const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
+
+/**
+ * Cuánto vence en cada mes sumando todas las tarjetas (resumen a pagar, en curso
+ * y cuotas futuras), para saber con qué plata contás. Se muestra si hay cuotas.
+ */
+function Commitments({ overviews }: { overviews: CardOverview[] }) {
+  if (!overviews.some((o) => o.upcoming.length > 0)) return null
+  const months = new Map<string, { ars: number; usd: number; open: boolean; cards: Map<string, number> }>()
+  for (const o of overviews) {
+    const stmts = [...(o.toPay ? [{ s: o.toPay, open: false }] : []), { s: o.open, open: true }, ...o.upcoming.map((s) => ({ s, open: false }))]
+    for (const { s, open } of stmts) {
+      if (!s.items.length) continue
+      const key = s.dueDate.slice(0, 7)
+      const row = months.get(key) ?? { ars: 0, usd: 0, open: false, cards: new Map() }
+      row.ars += s.ars
+      row.usd += s.usd
+      row.open ||= open
+      row.cards.set(o.card.name, (row.cards.get(o.card.name) ?? 0) + s.ars)
+      months.set(key, row)
+    }
+  }
+  const rows = [...months.entries()].sort(([a], [b]) => a.localeCompare(b))
+  return (
+    <div className="commitments">
+      <h3>Lo que ya tenés comprometido</h3>
+      <ul>
+        {rows.map(([month, r]) => (
+          <li key={month}>
+            <span className="commit-month">Vence en {monthLabel(month)}</span>
+            <span className="commit-amt">
+              {formatARS(r.ars)}
+              {r.usd > 0 && <span className="usd-tag">+ {formatUSD(r.usd)}</span>}
+            </span>
+            {(r.cards.size > 1 || r.open) && (
+              <span className="commit-sub">
+                {r.cards.size > 1 && [...r.cards].map(([name, v]) => `${name} ${formatARS(v)}`).join(' · ')}
+                {r.cards.size > 1 && r.open ? ' · ' : ''}
+                {r.open && 'incluye un resumen todavía abierto'}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function CardRow({
+  o,
+  getCategory,
+  usdCardRate,
+  onEdit,
+}: {
+  o: CardOverview
+  getCategory: CategoryLookup
+  usdCardRate: number | null
+  onEdit: () => void
+}) {
+  const { card, toPay, open } = o
+  const urgent = o.shouldAlert
+  const status = toPay
+    ? toPay.daysToDue === 0
       ? 'Vence hoy'
-      : `Vence en ${cycle.daysToDue} ${cycle.daysToDue === 1 ? 'día' : 'días'}`
-    : `Resumen abierto · cierra el ${shortDate(cycle.closingDate)}`
+      : `Vence en ${plural(toPay.daysToDue, 'día', 'días')}`
+    : `Cierra el ${shortDate(open.closingDate)}`
+  const toPayEmpty = !!toPay && toPay.items.length === 0
+  const hint = open.items.length > 0 ? ' Tus compras recientes van al resumen en curso.' : ''
 
   return (
     <li className={`card-item ${urgent ? 'is-urgent' : ''}`}>
@@ -104,27 +177,70 @@ function CardRow({ s, usdCardRate, onEdit }: { s: StatementSummary; usdCardRate:
             {card.autoDebit ? ' · débito automático' : ''}
           </span>
         </div>
-        <span className={`pill ${urgent ? 'warn' : cycle.isClosed ? 'info' : ''}`}>
+        <span className={`pill ${urgent ? 'warn' : toPay && !toPayEmpty ? 'info' : ''}`}>
           {urgent && <span aria-hidden>⚠ </span>}
           {status}
         </span>
       </div>
 
-      <div className="card-figures">
-        <div>
-          <span className="kpi-label">{cycle.isClosed ? `Resumen que vence el ${shortDate(cycle.dueDate)}` : 'Lo que llevás en este resumen'}</span>
-          <span className="fig">{formatARS(s.ars)}</span>
-        </div>
-        <div>
-          <span className="kpi-label">En dólares</span>
-          <span className={`fig ${s.usd > 0 ? 'usd' : ''}`}>{formatUSD(s.usd)}</span>
-          {s.usd > 0 && usdCardRate && <span className="kpi-sub">≈ {formatARS(Math.round(s.usd * usdCardRate))} al dólar tarjeta</span>}
-        </div>
+      <div className="stmt-grid">
+        <section className="stmt" aria-label="Resumen a pagar">
+          <span className="kpi-label">
+            A pagar{toPay ? ` · vence el ${shortDate(toPay.dueDate)}` : ''}
+          </span>
+          {!toPay ? (
+            <p className="stmt-empty">
+              Nada pendiente: el último resumen venció el {shortDate(o.lastDueDate)}.{hint}
+            </p>
+          ) : toPayEmpty ? (
+            <p className="stmt-empty">
+              No hay compras ni cuotas de esta tarjeta en el resumen que cerró el {shortDate(toPay.closingDate)}.{hint}
+            </p>
+          ) : (
+            <StatementFigures s={toPay} usdCardRate={usdCardRate} getCategory={getCategory} />
+          )}
+          {toPay && <span className="stmt-dates">Cerró el {shortDate(toPay.closingDate)}</span>}
+        </section>
+
+        <section className="stmt is-open" aria-label="Resumen en curso">
+          <span className="kpi-label">En curso · hasta hoy</span>
+          {open.items.length === 0 ? (
+            <p className="stmt-empty">Todavía sin compras en este resumen.</p>
+          ) : (
+            <StatementFigures s={open} usdCardRate={usdCardRate} getCategory={getCategory} />
+          )}
+          <span className="stmt-dates">
+            Cierra el {shortDate(open.closingDate)} · vence el {shortDate(open.dueDate)}
+          </span>
+        </section>
       </div>
 
-      {s.usd > 0 && cycle.isClosed && card.autoDebit && (
+      {o.upcoming.length > 0 && (
+        <details className="stmt-items upcoming">
+          <summary>
+            Cuotas que vienen: {formatARS(o.upcoming.reduce((a, s) => a + s.ars, 0))} en{' '}
+            {plural(o.upcoming.length, 'resumen', 'resúmenes')} más
+          </summary>
+          <ul>
+            {o.upcoming.map((s) => (
+              <li key={s.closingDate}>
+                <span className="stmt-item-date">{shortDate(s.dueDate)}</span>
+                <span className="stmt-item-desc">
+                  {s.items
+                    .map((i) => `${i.expense.description || getCategory(i.expense.categoryId).name} ${i.number}/${i.of}`)
+                    .join(' · ')}
+                </span>
+                <span className="stmt-item-amt">{formatARS(s.ars)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="footnote">Sólo cuotas ya cargadas: lo que compres de acá en más se suma.</p>
+        </details>
+      )}
+
+      {toPay && toPay.usd > 0 && card.autoDebit && (
         <p className="card-tip">
-          Pagá los <strong>{formatUSD(s.usd)}</strong> con dólares antes del {longDate(cycle.dueDate)}, así el débito automático sólo cobra los pesos.
+          Pagá los <strong>{formatUSD(toPay.usd)}</strong> con dólares antes del {longDate(toPay.dueDate)}, así el débito automático sólo cobra los pesos.
         </p>
       )}
 
@@ -135,9 +251,58 @@ function CardRow({ s, usdCardRate, onEdit }: { s: StatementSummary; usdCardRate:
         <button className="link" onClick={onEdit}>Editar</button>
       </div>
       <p className="footnote">
-        Compras del {shortDate(s.cycle.previousClosingDate)} (excl.) al {shortDate(s.cycle.closingDate)}. Las fechas de cierre y vencimiento cambian un poco cada mes: chequealas en tu resumen y ajustalas si hace falta.
+        Las fechas de cierre y vencimiento cambian un poco cada mes: chequealas en tu resumen y ajustalas si hace falta.
       </p>
     </li>
+  )
+}
+
+function StatementFigures({
+  s,
+  usdCardRate,
+  getCategory,
+}: {
+  s: StatementDetail
+  usdCardRate: number | null
+  getCategory: CategoryLookup
+}) {
+  return (
+    <>
+      <span className="fig">{formatARS(s.ars)}</span>
+      {s.usd > 0 && (
+        <span className="stmt-usd">
+          + <strong>{formatUSD(s.usd)}</strong>
+          {usdCardRate ? ` (≈ ${formatARS(Math.round(s.usd * usdCardRate))} al dólar tarjeta)` : ''}
+        </span>
+      )}
+      <details className="stmt-items">
+        <summary>
+          Ver {s.items.some((i) => i.of > 1) ? plural(s.items.length, 'compra o cuota', 'compras y cuotas') : plural(s.items.length, 'compra', 'compras')}
+        </summary>
+        <ul>
+          {s.items.map(({ expense: e, number, of, ars, usd }) => {
+            const c = getCategory(e.categoryId)
+            return (
+              <li key={e.id}>
+                <span className="stmt-item-date">{shortDate(e.date)}</span>
+                <span className="stmt-item-desc">
+                  <span aria-hidden>{c.emoji}</span> {e.description || c.name}
+                  {of > 1 && (
+                    <span className="stmt-item-cuota">
+                      Cuota {number}/{of} · total {formatARS(e.amount)}
+                    </span>
+                  )}
+                </span>
+                <span className="stmt-item-amt">{usd > 0 ? formatUSD(usd) : formatARS(ars)}</span>
+              </li>
+            )
+          })}
+        </ul>
+        <p className="footnote">
+          Compras del {shortDate(s.previousClosingDate)} (excl.) al {shortDate(s.closingDate)}.
+        </p>
+      </details>
+    </>
   )
 }
 

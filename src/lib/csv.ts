@@ -1,4 +1,5 @@
 import type { Category, Expense } from '../types'
+import { installmentsOf } from './cards'
 
 /**
  * Exportación pensada para Power BI: un modelo estrella chico.
@@ -19,7 +20,7 @@ const toCsv = (header: string[], rows: (string | number)[][]) =>
 export function expensesToCsv(expenses: Expense[]): string {
   const sorted = [...expenses].sort((a, b) => a.date.localeCompare(b.date))
   return toCsv(
-    ['id', 'fecha', 'monto', 'categoria_id', 'descripcion', 'medio_pago', 'moneda', 'monto_original', 'tarjeta_id'],
+    ['id', 'fecha', 'monto', 'categoria_id', 'descripcion', 'medio_pago', 'moneda', 'monto_original', 'tarjeta_id', 'cuotas'],
     sorted.map((e) => [
       e.id,
       e.date,
@@ -30,6 +31,7 @@ export function expensesToCsv(expenses: Expense[]): string {
       e.currency ?? 'ARS',
       e.currency === 'USD' && e.originalAmount != null ? e.originalAmount.toFixed(2) : '',
       e.cardId ?? '',
+      installmentsOf(e),
     ]),
   )
 }

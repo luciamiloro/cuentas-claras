@@ -19,6 +19,8 @@ create table if not exists public.expenses (
 alter table public.expenses add column if not exists currency text not null default 'ARS' check (currency in ('ARS', 'USD'));
 alter table public.expenses add column if not exists original_amount numeric(14, 2);
 alter table public.expenses add column if not exists card_id text;
+-- Cuotas: "amount" es siempre el total; los resúmenes de la tarjeta lo reparten en cuotas
+alter table public.expenses add column if not exists installments smallint not null default 1 check (installments between 1 and 48);
 
 create index if not exists expenses_user_date_idx on public.expenses (user_id, date);
 
@@ -107,7 +109,8 @@ select
   e.original_amount as monto_original,
   card.value ->> 'name' as tarjeta,
   coalesce(cat.categoria, cc.value ->> 'name', e.category_id) as categoria,
-  coalesce(cat.tipo, cc.value ->> 'kind', 'variable')         as tipo
+  coalesce(cat.tipo, cc.value ->> 'kind', 'variable')         as tipo,
+  e.installments   as cuotas
 from public.expenses e
 join auth.users u on u.id = e.user_id
 left join public.user_settings s on s.user_id = e.user_id

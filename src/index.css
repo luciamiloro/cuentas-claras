@@ -736,6 +736,91 @@ select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-w
 .card-actions a.btn { text-decoration: none; color: inherit; }
 .card-item .footnote { margin: 0; }
 
+/* Resumen a pagar / en curso */
+.stmt-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.stmt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+.card-item.is-urgent .stmt:not(.is-open) { background: var(--surface); }
+.stmt.is-open { background: transparent; border: 1px dashed var(--line); }
+.stmt-empty { margin: 2px 0; font-size: 14px; color: var(--ink-2); }
+.stmt-dates { font-size: 12px; color: var(--muted); }
+.stmt-usd { font-size: 13px; color: var(--ink-2); }
+.stmt-usd strong { color: var(--warn-ink); }
+.stmt-items { margin-top: 4px; font-size: 13px; }
+.stmt-items summary { cursor: pointer; color: var(--primary); font-weight: 600; padding: 4px 0; width: fit-content; }
+.stmt-items ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; }
+.stmt-items li {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  align-items: baseline;
+}
+.stmt-item-date { color: var(--muted); font-size: 12px; }
+.stmt-item-desc { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stmt-item-amt { font-variant-numeric: tabular-nums; font-weight: 600; }
+.stmt-items .footnote { margin-top: 6px; }
+
+.stmt-item-cuota { display: block; font-size: 12px; color: var(--muted); white-space: normal; }
+.stmt-items.upcoming { margin-top: 0; }
+.stmt-items.upcoming .stmt-item-desc { white-space: normal; color: var(--ink-2); font-size: 12px; }
+
+/* Comprometido por mes (todas las tarjetas) */
+.commitments {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent-wash);
+}
+.commitments h3 { margin: 0 0 6px; font-size: 15px; color: var(--accent-ink); }
+.commitments ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.commitments li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 7px 0;
+  border-top: 1px solid var(--line);
+}
+.commitments li:first-child { border-top: 0; }
+.commit-month { font-weight: 600; }
+.commit-amt { font-weight: 750; font-variant-numeric: tabular-nums; text-align: right; }
+.commit-sub { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+
+/* Tarjeta en el formulario */
+.card-pay-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 10px; }
+.cuota-tag {
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  vertical-align: 1px;
+}
+.installment-hint { font-size: 13px; font-weight: 700; color: var(--ink); }
+.statement-hint { color: var(--ink-2); }
+.card-notice {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-size: 13px;
+}
+.card-notice a { color: inherit; font-weight: 700; }
+select[aria-invalid='true'] { border-color: var(--up); }
+.link.no-card { font-size: inherit; color: var(--warn-ink); text-decoration: underline dotted; }
+
 .subform {
   display: flex;
   flex-direction: column;

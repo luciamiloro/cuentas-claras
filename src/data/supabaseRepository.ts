@@ -1,6 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Currency, Expense, NewExpense, PaymentMethod, Settings } from '../types'
 import { newId, normalizeSettings } from '../lib/settings'
+import { installmentsOf } from '../lib/cards'
 import type { ExpenseRepository } from './repository'
 
 interface ExpenseRow {
@@ -15,6 +16,7 @@ interface ExpenseRow {
   currency: Currency
   original_amount: number | string | null
   card_id: string | null
+  installments: number | null
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
@@ -28,6 +30,7 @@ const toRow = (e: NewExpense) => ({
   currency: e.currency ?? 'ARS',
   original_amount: e.currency === 'USD' ? (e.originalAmount ?? null) : null,
   card_id: e.paymentMethod === 'credito' ? (e.cardId ?? null) : null,
+  installments: installmentsOf(e),
 })
 
 const fromRow = (r: ExpenseRow): Expense => ({
@@ -41,6 +44,7 @@ const fromRow = (r: ExpenseRow): Expense => ({
   currency: r.currency ?? 'ARS',
   originalAmount: r.original_amount != null ? Number(r.original_amount) : null,
   cardId: r.card_id,
+  installments: Number(r.installments) > 1 ? Number(r.installments) : null,
 })
 
 /**

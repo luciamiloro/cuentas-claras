@@ -73,6 +73,8 @@ export function generateDemoExpenses(end: MonthKey, months = 6, seed = 42, today
         out.push({
           ...(usd ? { currency: 'USD' as const, originalAmount: usdAmount } : {}),
           ...(method === 'credito' ? { cardId: DEMO_CARD_ID } : {}),
+          // La ropa en cuotas, para que se vea lo comprometido en próximos resúmenes
+          ...(t.categoryId === 'ropa' ? { installments: 3 } : {}),
           id: `demo-${String(++n).padStart(4, '0')}`,
           date,
           amount: usd ? Math.round((usdAmount ?? 0) * 1450 * inflation) : amount,
@@ -93,6 +95,7 @@ export function generateDemoExpenses(end: MonthKey, months = 6, seed = 42, today
         description: 'Escapada de fin de semana',
         paymentMethod: 'credito',
         cardId: DEMO_CARD_ID,
+        installments: 6,
         createdAt: `${month}-18T12:00:00.000Z`,
       })
     }

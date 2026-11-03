@@ -5,7 +5,7 @@ import type { SupabaseRepository } from './data/supabaseRepository'
 import { useExpenses } from './hooks/useExpenses'
 import { currentMonth, shiftMonth, todayISO } from './lib/dates'
 import { monthLabel } from './lib/format'
-import { expensesInMonth, monthlyTotals, summarize, totalsByCategory } from './lib/stats'
+import { expensesInMonth, monthlyTotals, spreadInstallments, summarize, totalsByCategory } from './lib/stats'
 import { generateDemoExpenses, generateDemoSettings } from './lib/demo'
 import { ExpenseForm } from './components/ExpenseForm'
 import { KpiRow } from './components/KpiRow'
@@ -202,11 +202,13 @@ export default function App({ repo, account }: Props) {
   }
 
   const thisMonth = currentMonth()
-  const monthExpenses = useMemo(() => expensesInMonth(expenses, month), [expenses, month])
-  const summary = useMemo(() => summarize(expenses, month, catalog.get), [expenses, month, catalog])
-  const byCategory = useMemo(() => totalsByCategory(expenses, month, catalog.get), [expenses, month, catalog])
+  // En Gastos, las compras en cuotas cuentan de a una cuota por mes
+  const ledger = useMemo(() => spreadInstallments(expenses), [expenses])
+  const monthExpenses = useMemo(() => expensesInMonth(ledger, month), [ledger, month])
+  const summary = useMemo(() => summarize(ledger, month, catalog.get), [ledger, month, catalog])
+  const byCategory = useMemo(() => totalsByCategory(ledger, month, catalog.get), [ledger, month, catalog])
   const trendEnd = month > thisMonth ? month : thisMonth
-  const trend = useMemo(() => monthlyTotals(expenses, trendEnd, 6), [expenses, trendEnd])
+  const trend = useMemo(() => monthlyTotals(ledger, trendEnd, 6), [ledger, trendEnd])
 
   function goTo(m: MonthKey) {
     setMonth(m)
@@ -388,6 +390,7 @@ export default function App({ repo, account }: Props) {
             <CardsView
               cards={settings.cards}
               expenses={expenses}
+              getCategory={catalog.get}
               usdCardRate={usdCardRate}
               usdCardRateSource={usdCardRateSource}
               onSaveCards={(cards) => patchSettings({ cards }, 'Tarjetas guardadas')}
@@ -434,7 +437,10 @@ export default function App({ repo, account }: Props) {
                 onCreateCategory={createCategory}
                 cards={settings.cards}
                 usdCardRate={usdCardRate}
-                onAddCard={() => setTab('tarjetas')}
+                onAddCard={() => {
+                  setSheetOpen(false)
+                  setTab('tarjetas')
+                }}
                 onSaved={(m) => {
                   notify(m)
                   setSheetOpen(false)
@@ -457,10 +463,14 @@ export default function App({ repo, account }: Props) {
           <ExpenseList
             expenses={monthExpenses}
             getCategory={catalog.get}
+            cards={settings.cards}
             categoryFilter={categoryFilter}
             onClearFilter={() => setCategoryFilter(null)}
             onEdit={(e) => {
-              setEditing(e)
+              // Una cuota se edita como la compra completa
+              const original = e.installment ? expenses.find((x) => x.id === e.installment?.sourceId) : e
+              if (!original) return
+              setEditing(original)
               setSheetOpen(true)
               if (window.matchMedia('(min-width: 861px)').matches) window.scrollTo({ top: 0, behavior: 'smooth' })
             }}

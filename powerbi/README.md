@@ -4,10 +4,10 @@ La app exporta un **modelo estrella** listo para Power BI:
 
 | Archivo | Rol | Columnas |
 |---|---|---|
-| `gastos.csv` | Tabla de hechos (1 fila = 1 gasto) | `id, fecha, monto, categoria_id, descripcion, medio_pago, moneda, monto_original, tarjeta_id` |
+| `gastos.csv` | Tabla de hechos (1 fila = 1 gasto) | `id, fecha, monto, categoria_id, descripcion, medio_pago, moneda, monto_original, tarjeta_id, cuotas` |
 | `categorias.csv` | Dimensión | `categoria_id, categoria, emoji, tipo` (`fijo` / `variable`) |
 
-`monto` siempre está en pesos (los gastos en dólares se convierten con la cotización que cargaste); `monto_original` tiene los USD.
+`monto` siempre está en pesos (los gastos en dólares se convierten con la cotización que cargaste); `monto_original` tiene los USD. `cuotas` es 1 si fue en un pago; en compras en cuotas, `monto` es el **total** y queda en la fecha de compra.
 
 Formato: UTF‑8, separador coma, decimales con punto y fechas ISO (`2026-10-31`). Así Power Query no depende de la configuración regional de la PC.
 
@@ -26,7 +26,7 @@ Formato: UTF‑8, separador coma, decimales con punto y fechas ISO (`2026-10-31`
 let
     Origen = Csv.Document(
         File.Contents(CarpetaDatos & "gastos.csv"),
-        [Delimiter = ",", Columns = 9, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+        [Delimiter = ",", Columns = 10, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
     // Las celdas vacías de monto_original / tarjeta_id pasan a null antes de tipar
@@ -36,7 +36,8 @@ let
         {
             {"id", type text}, {"fecha", type date}, {"monto", type number},
             {"categoria_id", type text}, {"descripcion", type text}, {"medio_pago", type text},
-            {"moneda", type text}, {"monto_original", type number}, {"tarjeta_id", type text}
+            {"moneda", type text}, {"monto_original", type number}, {"tarjeta_id", type text},
+            {"cuotas", Int64.Type}
         },
         "en-US"   // fechas ISO y punto decimal, sin importar el idioma de Windows
     ),

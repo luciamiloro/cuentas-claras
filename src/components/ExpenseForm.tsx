@@ -3,7 +3,8 @@ import type { Category, CreditCard, Currency, CustomCategory, Expense, MonthKey,
 import { PAYMENT_METHODS } from '../types'
 import type { CategoryDraft, CategoryLookup } from '../lib/categories'
 import { defaultDateFor } from '../lib/dates'
-import { formatARS, formatUSD, parseAmount } from '../lib/format'
+import { formatARS, formatUSD, parseAmount, shortDate } from '../lib/format'
+import { INSTALLMENT_OPTIONS, installmentAmount, installmentPeriods, installmentsOf } from '../lib/cards'
 import { CategoryEditor } from './CategoryEditor'
 
 interface Props {
@@ -63,7 +64,9 @@ export function ExpenseForm({
   const [date, setDate] = useState(() => editing?.date ?? defaultDateFor(month))
   const [description, setDescription] = useState(editing?.description ?? '')
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(editing?.paymentMethod ?? 'debito')
-  const [cardId, setCardId] = useState(editing?.cardId ?? cards[0]?.id ?? '')
+  // Con una sola tarjeta la preseleccionamos; con varias, hay que elegir.
+  const [cardId, setCardId] = useState(editing?.cardId ?? (cards.length === 1 ? cards[0].id : ''))
+  const [installments, setInstallments] = useState(() => (editing ? installmentsOf(editing) : 1))
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
   const [creatingCategory, setCreatingCategory] = useState(false)
@@ -104,14 +107,37 @@ export function ExpenseForm({
   const parsedRate = parseAmount(rate)
   const isUsd = currency === 'USD'
   const arsAmount = isUsd ? parsed * parsedRate : parsed
-  const validCard = cards.some((c) => c.id === cardId) ? cardId : (cards[0]?.id ?? '')
+  const validCard = cards.some((c) => c.id === cardId) ? cardId : cards.length === 1 ? cards[0].id : ''
+  const isCredit = paymentMethod === 'credito'
+  const [triedSubmit, setTriedSubmit] = useState(false)
+  const cardMissing = isCredit && cards.length > 0 && !validCard && triedSubmit
+  const chosenCard = isCredit ? cards.find((c) => c.id === validCard) : undefined
+  // Cuotas: sólo compras en pesos con tarjeta de crédito
+  const canInstall = isCredit && !isUsd && cards.length > 0
+  const n = canInstall ? installments : 1
+  const installmentHint =
+    n > 1 && Number.isFinite(parsed) && parsed > 0
+      ? `${n} cuotas de ${formatARS(installmentAmount(parsed, n))}: en Gastos se cuenta una por mes desde el mes de la compra.`
+      : null
+  const statementHint = (() => {
+    if (!chosenCard || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null
+    const { first, last } = installmentPeriods(chosenCard, date, n)
+    return n > 1
+      ? `La 1.ª cuota entra en el resumen que vence el ${shortDate(first.dueDate)}; la última, en el que vence el ${shortDate(last.dueDate)}.`
+      : `Entra en el resumen que vence el ${shortDate(first.dueDate)} (cierra el ${shortDate(first.closingDate)}).`
+  })()
+  const installmentChoices = INSTALLMENT_OPTIONS.includes(installments)
+    ? INSTALLMENT_OPTIONS
+    : [...INSTALLMENT_OPTIONS, installments].sort((a, b) => a - b)
 
   async function handleSubmit(ev: FormEvent) {
     ev.preventDefault()
+    setTriedSubmit(true)
     if (!Number.isFinite(parsed) || parsed <= 0) return setError('Poné un monto mayor a cero.')
     if (isUsd && (!Number.isFinite(parsedRate) || parsedRate <= 0)) return setError('Poné la cotización del dólar para pasarlo a pesos.')
     if (!selectedId) return setError('Elegí una categoría.')
     if (!date) return setError('Falta la fecha.')
+    if (isCredit && cards.length > 0 && !validCard) return setError('Elegí con qué tarjeta pagaste.')
     setError(null)
     setSaving(true)
     const ok = await onSubmit(
@@ -119,7 +145,8 @@ export function ExpenseForm({
         amount: Math.round(arsAmount * 100) / 100,
         currency,
         originalAmount: isUsd ? Math.round(parsed * 100) / 100 : null,
-        cardId: paymentMethod === 'credito' && validCard ? validCard : null,
+        cardId: isCredit && validCard ? validCard : null,
+        installments: n > 1 ? n : null,
         categoryId: selectedId,
         date,
         description: description.trim(),
@@ -129,10 +156,15 @@ export function ExpenseForm({
     )
     setSaving(false)
     if (!ok) return setError('No se pudo guardar. Revisá tu conexión y probá de nuevo.')
-    onSaved(editing ? 'Gasto actualizado' : `Cargado: ${isUsd ? formatUSD(parsed) : formatARS(parsed)}`)
+    onSaved(
+      editing
+        ? 'Gasto actualizado'
+        : `Cargado: ${isUsd ? formatUSD(parsed) : formatARS(parsed)}${n > 1 ? ` en ${n} cuotas` : ''}`,
+    )
     if (editing) return onCancelEdit()
     setAmount('')
     setDescription('')
+    setTriedSubmit(false)
     amountRef.current?.focus()
   }
 
@@ -265,23 +297,62 @@ export function ExpenseForm({
 
       {paymentMethod === 'credito' &&
         (cards.length ? (
-          <label className="field">
-            <span className="field-label">Tarjeta</span>
-            <select id="expense-card" value={validCard} onChange={(e) => setCardId(e.target.value)}>
-              {cards.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="field">
+            <div className={canInstall ? 'card-pay-row' : ''}>
+              <div className="field">
+                <label className="field-label" htmlFor="expense-card">Tarjeta</label>
+                <select
+                  id="expense-card"
+                  value={validCard}
+                  required
+                  aria-invalid={cardMissing || undefined}
+                  onChange={(e) => setCardId(e.target.value)}
+                >
+                  {!validCard && (
+                    <option value="" disabled>
+                      Elegí una tarjeta
+                    </option>
+                  )}
+                  {cards.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {canInstall && (
+                <div className="field">
+                  <label className="field-label" htmlFor="expense-installments">Cuotas</label>
+                  <select
+                    id="expense-installments"
+                    value={installments}
+                    onChange={(e) => setInstallments(Number(e.target.value))}
+                  >
+                    {installmentChoices.map((k) => (
+                      <option key={k} value={k}>
+                        {k === 1 ? 'En 1 pago' : `${k} cuotas`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+            {installmentHint && <span className="installment-hint">{installmentHint}</span>}
+            {statementHint && <span className="hint statement-hint">{statementHint}</span>}
+            {isUsd && <span className="hint">Las compras en dólares van en un pago.</span>}
+          </div>
         ) : (
-          <p className="hint">
-            Para que te avise antes del vencimiento,{' '}
-            <button type="button" className="link" onClick={onAddCard}>
-              agregá tu tarjeta
-            </button>
-            .
+          <p className="card-notice">
+            Todavía no cargaste tarjetas. Agregá una para que el gasto entre en su resumen.{' '}
+            <a
+              href="#tarjetas"
+              onClick={(e) => {
+                e.preventDefault()
+                onAddCard()
+              }}
+            >
+              Agregar tarjeta
+            </a>
           </p>
         ))}
 

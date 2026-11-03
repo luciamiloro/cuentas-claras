@@ -1,23 +1,27 @@
 import { useMemo, useState } from 'react'
-import type { Expense } from '../types'
+import type { CreditCard, Expense } from '../types'
 import { PAYMENT_METHODS } from '../types'
 import type { CategoryLookup } from '../lib/categories'
-import { dayLabel, formatARS, formatUSD } from '../lib/format'
+import { dayLabel, formatARS, formatUSD, shortDate } from '../lib/format'
+import type { LedgerEntry } from '../lib/stats'
 
 interface Props {
-  expenses: Expense[]
+  /** Movimientos del mes; las compras en cuotas vienen como una fila por cuota */
+  expenses: LedgerEntry[]
   /** Resuelve categorías de fábrica y propias (archivadas incluidas) */
   getCategory: CategoryLookup
+  /** Para mostrar el nombre de la tarjeta en los gastos a crédito */
+  cards: CreditCard[]
   categoryFilter: string | null
   onClearFilter: () => void
-  onEdit: (e: Expense) => void
+  onEdit: (e: LedgerEntry) => void
   onDelete: (id: string) => void
   editingId: string | null
 }
 
 const methodLabel = new Map(PAYMENT_METHODS.map((m) => [m.id, m.label]))
 
-export function ExpenseList({ expenses, getCategory, categoryFilter, onClearFilter, onEdit, onDelete, editingId }: Props) {
+export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onClearFilter, onEdit, onDelete, editingId }: Props) {
   const [query, setQuery] = useState('')
   const [showAll, setShowAll] = useState(false)
   const LIMIT = 12
@@ -29,6 +33,14 @@ export function ExpenseList({ expenses, getCategory, categoryFilter, onClearFilt
       .filter((e) => !q || e.description.toLowerCase().includes(q) || getCategory(e.categoryId).name.toLowerCase().includes(q))
       .sort((a, b) => b.date.localeCompare(a.date) || b.createdAt.localeCompare(a.createdAt))
   }, [expenses, categoryFilter, query, getCategory])
+
+  const cardName = useMemo(() => new Map(cards.map((c) => [c.id, c.name])), [cards])
+  /** Gasto a crédito sin tarjeta (o con una que ya se borró): se puede editar para asignarle una */
+  const hasNoCard = (e: Expense) => e.paymentMethod === 'credito' && !(e.cardId && cardName.has(e.cardId))
+  /** "Visa Santander 4168" para crédito con tarjeta; si no, el medio de pago */
+  const methodText = (e: Expense) =>
+    (e.paymentMethod === 'credito' && e.cardId && cardName.get(e.cardId)) ||
+    (methodLabel.get(e.paymentMethod) ?? e.paymentMethod)
 
   const visibleTotal = visible.reduce((a, e) => a + e.amount, 0)
   const filterCat = categoryFilter ? getCategory(categoryFilter) : null
@@ -70,17 +82,37 @@ export function ExpenseList({ expenses, getCategory, categoryFilter, onClearFilt
             <tbody>
               {(showAll ? visible : visible.slice(0, LIMIT)).map((e) => {
                 const c = getCategory(e.categoryId)
+                const inst = e.installment
+                const realId = inst?.sourceId ?? e.id
+                const label = e.description || c.name
                 return (
-                  <tr key={e.id} className={editingId === e.id ? 'is-editing' : ''}>
+                  <tr key={e.id} className={editingId === realId ? 'is-editing' : ''}>
                     <td className="date">{dayLabel(e.date)}</td>
                     <td>
                       <div className="detail">
                         <span className="detail-main">
-                          <span aria-hidden>{c.emoji}</span> {e.description || c.name}
+                          <span aria-hidden>{c.emoji}</span> {label}
+                          {inst && (
+                            <span className="cuota-tag">
+                              Cuota {inst.number}/{inst.of}
+                            </span>
+                          )}
                         </span>
                         <span className="detail-sub">
+                          {inst && inst.number > 1 ? `Compra del ${shortDate(inst.sourceDate)} · ` : ''}
                           {e.description ? `${c.name} · ` : ''}
-                          {methodLabel.get(e.paymentMethod) ?? e.paymentMethod}
+                          {hasNoCard(e) ? (
+                            <button
+                              type="button"
+                              className="link no-card"
+                              onClick={() => onEdit(e)}
+                              title="Editar para asignarle una tarjeta"
+                            >
+                              Crédito · sin tarjeta
+                            </button>
+                          ) : (
+                            methodText(e)
+                          )}
                         </span>
                       </div>
                     </td>
@@ -89,10 +121,25 @@ export function ExpenseList({ expenses, getCategory, categoryFilter, onClearFilt
                       {e.currency === 'USD' && e.originalAmount != null && (
                         <span className="usd-tag">{formatUSD(e.originalAmount)}</span>
                       )}
+                      {inst && <span className="usd-tag">de {formatARS(inst.total)} en total</span>}
                     </td>
                     <td className="actions">
-                      <button className="icon-btn" onClick={() => onEdit(e)} aria-label={`Editar ${e.description || c.name}`} title="Editar">✎</button>
-                      <button className="icon-btn" onClick={() => onDelete(e.id)} aria-label={`Borrar ${e.description || c.name}`} title="Borrar">🗑</button>
+                      <button
+                        className="icon-btn"
+                        onClick={() => onEdit(e)}
+                        aria-label={inst ? `Editar la compra ${label} (${inst.of} cuotas)` : `Editar ${label}`}
+                        title={inst ? 'Editar la compra' : 'Editar'}
+                      >
+                        ✎
+                      </button>
+                      <button
+                        className="icon-btn"
+                        onClick={() => onDelete(realId)}
+                        aria-label={inst ? `Borrar la compra ${label} con sus ${inst.of} cuotas` : `Borrar ${label}`}
+                        title={inst ? `Borrar la compra (las ${inst.of} cuotas)` : 'Borrar'}
+                      >
+                        🗑
+                      </button>
                     </td>
                   </tr>
                 )
