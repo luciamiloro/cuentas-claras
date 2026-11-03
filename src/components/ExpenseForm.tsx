@@ -115,15 +115,18 @@ export function ExpenseForm({
   // Cuotas: sólo compras en pesos con tarjeta de crédito
   const canInstall = isCredit && !isUsd && cards.length > 0
   const n = canInstall ? installments : 1
-  const installmentHint =
-    n > 1 && Number.isFinite(parsed) && parsed > 0
-      ? `${n} cuotas de ${formatARS(installmentAmount(parsed, n))}: en Gastos se cuenta una por mes, en el mes en que vence cada resumen.`
-      : null
+  // "4 cuotas de $ 56.712,50", en vivo. Si no divide justo, la última absorbe los centavos y se aclara.
+  const installmentHint = (() => {
+    if (n <= 1 || !Number.isFinite(parsed) || parsed <= 0) return null
+    const each = installmentAmount(parsed, n)
+    const last = installmentAmount(parsed, n, n - 1)
+    return `${n} cuotas de ${formatARS(each)}${last !== each ? ` (la última, ${formatARS(last)})` : ''}`
+  })()
   const statementHint = (() => {
     if (!chosenCard || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null
     const { first, last } = installmentPeriods(chosenCard, date, n)
     return n > 1
-      ? `La 1.ª cuota entra en el resumen que vence el ${shortDate(first.dueDate)}; la última, en el que vence el ${shortDate(last.dueDate)}.`
+      ? `La 1.ª cuota entra en el resumen que vence el ${shortDate(first.dueDate)}; la última, en el que vence el ${shortDate(last.dueDate)}. En Gastos se cuenta una por mes.`
       : `Entra en el resumen que vence el ${shortDate(first.dueDate)} (cierra el ${shortDate(first.closingDate)}): en Gastos cuenta en ${monthLabel(monthOf(first.dueDate)).split(' ')[0].toLowerCase()}.`
   })()
   const installmentChoices = INSTALLMENT_OPTIONS.includes(installments)
@@ -337,7 +340,9 @@ export function ExpenseForm({
                 </div>
               )}
             </div>
-            {installmentHint && <span className="installment-hint">{installmentHint}</span>}
+            <span className="installment-hint" aria-live="polite" hidden={!installmentHint}>
+              {installmentHint}
+            </span>
             {statementHint && <span className="hint statement-hint">{statementHint}</span>}
             {isUsd && <span className="hint">Las compras en dólares van en un pago.</span>}
           </div>

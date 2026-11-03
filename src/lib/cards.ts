@@ -61,7 +61,8 @@ export function currentCycle(card: CreditCard, today = todayISO()): CardCycle {
 // ---------- Cuotas ----------
 
 export const MAX_INSTALLMENTS = 48
-export const INSTALLMENT_OPTIONS = [1, 2, 3, 6, 9, 12, 18, 24]
+/** Opciones del selector: de 1 a 24. Un gasto viejo con más (hasta MAX_INSTALLMENTS) se agrega al editarlo. */
+export const INSTALLMENT_OPTIONS = Array.from({ length: 24 }, (_, i) => i + 1)
 
 /** Cantidad de cuotas válida de un gasto: sólo compras en pesos con crédito; si no, 1. */
 export function installmentsOf(e: Pick<Expense, 'paymentMethod' | 'currency' | 'installments'>): number {
