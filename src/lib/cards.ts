@@ -71,11 +71,16 @@ export function installmentsOf(e: Pick<Expense, 'paymentMethod' | 'currency' | '
   return Number.isInteger(n) && n > 1 ? Math.min(n, MAX_INSTALLMENTS) : 1
 }
 
-/** Monto de la cuota `k` (0 = primera) de `n`: partes iguales; la última absorbe los centavos del redondeo. */
+/**
+ * Monto de la cuota `k` (0 = primera) de `n`: partes iguales; la última absorbe los centavos que sobran.
+ * Se calcula en centavos enteros: con floats, 268284.72 * 100 / 6 da 4471411.999… y `floor`
+ * perdía un centavo. Las `n` cuotas suman siempre exactamente el total (en ARS o USD).
+ */
 export function installmentAmount(total: number, n: number, k = 0): number {
   if (n <= 1) return total
-  const base = Math.floor((total * 100) / n) / 100
-  return k === n - 1 ? Math.round((total - base * (n - 1)) * 100) / 100 : base
+  const cents = Math.round(total * 100)
+  const base = Math.floor(cents / n)
+  return (k === n - 1 ? cents - base * (n - 1) : base) / 100
 }
 
 // ---------- Resúmenes ----------

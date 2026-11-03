@@ -4,6 +4,34 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import type { CreditCard, Expense } from '../src/types'
 import { buildLedger, expensesInMonth, monthlyTotals, summarize, totalsByCategory } from '../src/lib/stats'
+import { installmentAmount } from '../src/lib/cards'
+
+/** Todas las cuotas, en centavos enteros (para comparar sumas sin errores de float). */
+const cuotasEnCentavos = (total: number, n: number) =>
+  Array.from({ length: n }, (_, k) => Math.round(installmentAmount(total, n, k) * 100))
+
+test('cuotas: 268.284,72 en 6 → 6 cuotas de 44.714,12 (sin perder centavos por el float)', () => {
+  assert.deepEqual(
+    Array.from({ length: 6 }, (_, k) => installmentAmount(268284.72, 6, k)),
+    [44714.12, 44714.12, 44714.12, 44714.12, 44714.12, 44714.12],
+  )
+})
+
+test('cuotas: 747.500 en 6 → 5 de 124.583,33 y la última de 124.583,35; suman el total', () => {
+  assert.deepEqual(
+    Array.from({ length: 6 }, (_, k) => installmentAmount(747500, 6, k)),
+    [124583.33, 124583.33, 124583.33, 124583.33, 124583.33, 124583.35],
+  )
+})
+
+test('cuotas: la suma es siempre exactamente el total', () => {
+  for (const total of [268284.72, 747500, 0.05, 999.99, 100000, 20000, 1234567.89, 0.1 + 0.2]) {
+    for (let n = 2; n <= 48; n++) {
+      const sum = cuotasEnCentavos(total, n).reduce((a, b) => a + b, 0)
+      assert.equal(sum, Math.round(total * 100), `${total} en ${n}`)
+    }
+  }
+})
 
 // Tarjeta que cierra el 29 y vence el 11 (del mes siguiente)
 const card: CreditCard = { id: 'visa', name: 'Visa', closingDay: 29, dueDay: 11, autoDebit: true, remindDaysBefore: 3 }

@@ -469,7 +469,13 @@ select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-w
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .table td.num { font-weight: 600; }
 .date { color: var(--ink-2); white-space: nowrap; font-size: 13px; text-transform: capitalize; }
-.detail { display: flex; flex-direction: column; }
+.detail { display: flex; flex-direction: column; min-width: 0; overflow-wrap: anywhere; }
+/* "de $ 268.284,72 en total" puede bajar de renglón (el $ y el número no se separan: van con espacio duro) */
+.num .usd-tag { white-space: normal; }
+/* Red de seguridad: si algo no entra, scrollea la tabla y no toda la página */
+.table-scroll { overflow-x: auto; }
+/* Fecha dentro del detalle: sólo en el celu, donde se oculta la columna Fecha */
+.date-inline { display: none; text-transform: capitalize; }
 .detail-main { font-weight: 500; }
 .detail-sub { font-size: 12px; color: var(--muted); }
 .actions { text-align: right; white-space: nowrap; width: 1%; }
@@ -481,6 +487,13 @@ select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-w
   .table th.num { text-align: right; }
 .table td { padding: 8px 4px; }
   .search { max-width: 140px; }
+  /* Sin columna Fecha: la fecha pasa a la línea gris del detalle */
+  .table .date-col { display: none; }
+  .date-inline { display: inline; }
+  /* Editar y borrar, uno arriba del otro: así el detalle tiene lugar */
+  .actions { white-space: normal; }
+  .actions .icon-btn { display: grid; place-items: center; width: 34px; height: 34px; }
+  .actions .link { margin-left: 0; }
 }
 
 .show-more { display: block; margin: 12px auto 0; }

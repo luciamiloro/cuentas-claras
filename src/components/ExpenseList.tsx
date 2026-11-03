@@ -70,10 +70,11 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
         <p className="empty">{expenses.length ? 'Nada coincide con el filtro.' : 'Sin movimientos este mes.'}</p>
       ) : (
         <>
+          <div className="table-scroll">
           <table className="table">
             <thead>
               <tr>
-                <th scope="col">Fecha</th>
+                <th scope="col" className="date-col">Fecha</th>
                 <th scope="col">Detalle</th>
                 <th scope="col" className="num">Monto</th>
                 <th scope="col"><span className="sr-only">Acciones</span></th>
@@ -85,12 +86,11 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
                 const inst = e.installment
                 const realId = inst?.sourceId ?? e.id
                 const label = e.description || c.name
+                // Compra de otro mes que se paga en este (resumen de tarjeta): se ve el mes
+                const dateText = e.date.startsWith(e.month) ? dayLabel(e.date) : shortDate(e.date)
                 return (
                   <tr key={e.id} className={editingId === realId ? 'is-editing' : ''}>
-                    <td className="date">
-                      {/* Compra de otro mes que se paga en este (resumen de tarjeta): se ve el mes */}
-                      {e.date.startsWith(e.month) ? dayLabel(e.date) : shortDate(e.date)}
-                    </td>
+                    <td className="date date-col">{dateText}</td>
                     <td>
                       <div className="detail">
                         <span className="detail-main">
@@ -102,6 +102,8 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
                           )}
                         </span>
                         <span className="detail-sub">
+                          {/* En el celu la columna Fecha se oculta y la fecha va acá */}
+                          <span className="date-inline">{dateText} · </span>
                           {inst && inst.number > 1 && !e.dueDate ? `Compra del ${shortDate(inst.sourceDate)} · ` : ''}
                           {e.dueDate ? `Vence ${shortDate(e.dueDate)} · ` : ''}
                           {e.description ? `${c.name} · ` : ''}
@@ -151,12 +153,15 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
             </tbody>
             <tfoot>
               <tr>
-                <td colSpan={2}>{visible.length} {visible.length === 1 ? 'movimiento' : 'movimientos'}</td>
+                {/* Sin colSpan: en el celu la columna Fecha desaparece y el total tiene que seguir bajo "Monto" */}
+                <td className="date-col" />
+                <td>{visible.length} {visible.length === 1 ? 'movimiento' : 'movimientos'}</td>
                 <td className="num">{formatARS(visibleTotal)}</td>
                 <td />
               </tr>
             </tfoot>
           </table>
+          </div>
           {visible.length > LIMIT && (
             <button className="btn ghost show-more" onClick={() => setShowAll((v) => !v)}>
               {showAll ? 'Mostrar menos' : `Ver los ${visible.length} movimientos`}
