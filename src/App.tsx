@@ -5,7 +5,7 @@ import type { SupabaseRepository } from './data/supabaseRepository'
 import { useExpenses } from './hooks/useExpenses'
 import { currentMonth, shiftMonth, todayISO } from './lib/dates'
 import { monthLabel } from './lib/format'
-import { expensesInMonth, monthlyTotals, spreadInstallments, summarize, totalsByCategory } from './lib/stats'
+import { buildLedger, expensesInMonth, monthlyTotals, summarize, totalsByCategory } from './lib/stats'
 import { generateDemoExpenses, generateDemoSettings } from './lib/demo'
 import { ExpenseForm } from './components/ExpenseForm'
 import { KpiRow } from './components/KpiRow'
@@ -202,8 +202,9 @@ export default function App({ repo, account }: Props) {
   }
 
   const thisMonth = currentMonth()
-  // En Gastos, las compras en cuotas cuentan de a una cuota por mes
-  const ledger = useMemo(() => spreadInstallments(expenses), [expenses])
+  // En Gastos, cada gasto se imputa al mes en que se paga: crédito con tarjeta al mes de
+  // vencimiento de su resumen, y las cuotas de a una por mes. Todo lo de abajo usa el ledger.
+  const ledger = useMemo(() => buildLedger(expenses, settings.cards), [expenses, settings.cards])
   const monthExpenses = useMemo(() => expensesInMonth(ledger, month), [ledger, month])
   const summary = useMemo(() => summarize(ledger, month, catalog.get), [ledger, month, catalog])
   const byCategory = useMemo(() => totalsByCategory(ledger, month, catalog.get), [ledger, month, catalog])
@@ -467,8 +468,9 @@ export default function App({ repo, account }: Props) {
             categoryFilter={categoryFilter}
             onClearFilter={() => setCategoryFilter(null)}
             onEdit={(e) => {
-              // Una cuota se edita como la compra completa
-              const original = e.installment ? expenses.find((x) => x.id === e.installment?.sourceId) : e
+              // Se edita el gasto guardado (una cuota, como la compra completa), no la fila imputada
+              const sourceId = e.installment?.sourceId ?? e.id
+              const original = expenses.find((x) => x.id === sourceId)
               if (!original) return
               setEditing(original)
               setSheetOpen(true)
@@ -491,6 +493,7 @@ export default function App({ repo, account }: Props) {
 
           <DataPanel
             expenses={expenses}
+            cards={settings.cards}
             categories={catalog.all}
             customCategories={settings.categories}
             onImportCategories={async (list) => {

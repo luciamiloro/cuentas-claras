@@ -147,6 +147,11 @@ export function installmentPeriods(card: CreditCard, date: string, n: number): {
   return { first: periodByClosingMonth(card, idx), last: periodByClosingMonth(card, idx + Math.max(n, 1) - 1) }
 }
 
+/** Vencimiento del resumen en el que cae la cuota `k` (0 = primera o pago único) de una compra hecha en `date`. */
+export function chargeDueDate(card: CreditCard, date: string, k = 0): string {
+  return periodByClosingMonth(card, closingMonthFor(card, date) + k).dueDate
+}
+
 /** Lo que una compra aporta a un resumen: la compra entera o una de sus cuotas. */
 export interface StatementCharge {
   expense: Expense

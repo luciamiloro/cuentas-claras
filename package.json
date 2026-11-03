@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "build:demo": "tsc -b && vite build --mode demo",
     "typecheck": "tsc -b",
+    "test": "tsx --test tests/*.test.ts",
     "sample:powerbi": "tsx scripts/generate-sample.ts"
   },
   "dependencies": {

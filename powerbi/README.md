@@ -4,10 +4,26 @@ La app exporta un **modelo estrella** listo para Power BI:
 
 | Archivo | Rol | Columnas |
 |---|---|---|
-| `gastos.csv` | Tabla de hechos (1 fila = 1 gasto) | `id, fecha, monto, categoria_id, descripcion, medio_pago, moneda, monto_original, tarjeta_id, cuotas` |
+| `gastos.csv` | Tabla de hechos (1 fila = 1 gasto en el mes en que se paga; las compras en cuotas, 1 fila por cuota) | `id, fecha, monto, categoria_id, descripcion, medio_pago, moneda, monto_original, tarjeta_id, cuotas, mes, vencimiento, cuota, monto_total` |
 | `categorias.csv` | Dimensión | `categoria_id, categoria, emoji, tipo` (`fijo` / `variable`) |
 
-`monto` siempre está en pesos (los gastos en dólares se convierten con la cotización que cargaste); `monto_original` tiene los USD. `cuotas` es 1 si fue en un pago; en compras en cuotas, `monto` es el **total** y queda en la fecha de compra.
+Los gastos se imputan igual que en la pantalla Gastos de la app:
+
+- **Crédito con tarjeta** → al mes en que **vence el resumen** donde cae. Ej.: compra del 21/10 con una tarjeta que cierra el 29 y vence el 11 → resumen que vence el 11/11 → `mes = 2026-11-01`.
+- **Cuotas** → una fila por cuota, cada una en el mes de su resumen (sin tarjeta: una por mes desde la compra).
+- **El resto** (efectivo, débito, transferencia, crédito sin tarjeta) → al mes de la compra.
+
+Columnas:
+
+- `fecha`: el día de la compra.
+- `mes`: el primer día del mes imputado. **Es la fecha que hay que usar para los totales por mes.**
+- `vencimiento`: sólo en crédito con tarjeta.
+- `monto`: lo que se imputa a ese mes. Si es una cuota, el monto de la cuota.
+- `monto_total`: la compra entera.
+- `cuotas`: cuántas tiene la compra (1 si fue en un pago).
+- `cuota`: el número de esta fila. La clave única es `id` + `cuota`.
+
+`monto` siempre está en pesos (los gastos en dólares se convierten con la cotización que cargaste); `monto_original` tiene los USD.
 
 Formato: UTF‑8, separador coma, decimales con punto y fechas ISO (`2026-10-31`). Así Power Query no depende de la configuración regional de la PC.
 
@@ -26,18 +42,19 @@ Formato: UTF‑8, separador coma, decimales con punto y fechas ISO (`2026-10-31`
 let
     Origen = Csv.Document(
         File.Contents(CarpetaDatos & "gastos.csv"),
-        [Delimiter = ",", Columns = 10, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
+        [Delimiter = ",", Columns = 14, Encoding = 65001, QuoteStyle = QuoteStyle.Csv]
     ),
     Encabezados = Table.PromoteHeaders(Origen, [PromoteAllScalars = true]),
-    // Las celdas vacías de monto_original / tarjeta_id pasan a null antes de tipar
-    Vacios = Table.ReplaceValue(Encabezados, "", null, Replacer.ReplaceValue, {"monto_original", "tarjeta_id"}),
+    // Las celdas vacías de monto_original / tarjeta_id / vencimiento pasan a null antes de tipar
+    Vacios = Table.ReplaceValue(Encabezados, "", null, Replacer.ReplaceValue, {"monto_original", "tarjeta_id", "vencimiento"}),
     Tipos = Table.TransformColumnTypes(
         Vacios,
         {
             {"id", type text}, {"fecha", type date}, {"monto", type number},
             {"categoria_id", type text}, {"descripcion", type text}, {"medio_pago", type text},
             {"moneda", type text}, {"monto_original", type number}, {"tarjeta_id", type text},
-            {"cuotas", Int64.Type}
+            {"cuotas", Int64.Type}, {"mes", type date}, {"vencimiento", type date},
+            {"cuota", Int64.Type}, {"monto_total", type number}
         },
         "en-US"   // fechas ISO y punto decimal, sin importar el idioma de Windows
     ),
@@ -70,7 +87,7 @@ in
     Tipo
 ```
 
-> Tip: si querés ir sumando exportaciones mes a mes, cambiá `File.Contents` por `Folder.Files(CarpetaDatos)` filtrando los `gastos*.csv` y combinándolos (quitando duplicados por `id`).
+> Tip: si querés ir sumando exportaciones mes a mes, cambiá `File.Contents` por `Folder.Files(CarpetaDatos)` filtrando los `gastos*.csv` y combinándolos (quitando duplicados por `id` + `cuota`).
 
 ---
 
@@ -81,7 +98,7 @@ in
 ```dax
 Calendario =
 VAR _min = DATE ( YEAR ( MIN ( Gastos[fecha] ) ), 1, 1 )
-VAR _max = DATE ( YEAR ( MAX ( Gastos[fecha] ) ), 12, 31 )
+VAR _max = DATE ( YEAR ( MAX ( Gastos[mes] ) ), 12, 31 )   -- las cuotas llegan a meses futuros
 RETURN
     ADDCOLUMNS (
         CALENDAR ( _min, _max ),
@@ -101,11 +118,14 @@ RETURN
 **Relaciones** (1 → *, dirección simple):
 
 ```
-Calendario[Date]          1 ──── * Gastos[fecha]
+Calendario[Date]          1 ──── * Gastos[mes]            (activa: mes en que se paga, como la app)
+Calendario[Date]          1 ┄┄┄┄ * Gastos[fecha]          (inactiva: día de la compra, para "Hábitos")
 Categorias[categoria_id]  1 ──── * Gastos[categoria_id]
 ```
 
-Ocultá en la vista de informe las columnas técnicas (`id`, `categoria_id`, `medio_pago`, `emoji`) para que el panel de campos quede limpio.
+`mes` es siempre el día 1, así que la relación activa sirve para meses y años, no para días de la semana. Para eso está la relación inactiva con `fecha` y la medida `Gastos por Fecha de Compra`.
+
+Ocultá en la vista de informe las columnas técnicas (`id`, `cuota`, `categoria_id`, `medio_pago`, `emoji`) para que el panel de campos quede limpio.
 
 ---
 
@@ -115,6 +135,10 @@ Creá una tabla vacía `_Medidas` (Inicio → Especificar datos → Cargar) para
 
 ```dax
 Total Gastos = SUM ( Gastos[monto] )
+
+-- Mismo total, pero por el día de la compra (usa la relación inactiva con Gastos[fecha])
+Gastos por Fecha de Compra =
+CALCULATE ( [Total Gastos], USERELATIONSHIP ( Calendario[Date], Gastos[fecha] ) )
 
 Cant. Gastos = COUNTROWS ( Gastos )
 
@@ -199,7 +223,7 @@ Formatos: `Total Gastos`, `Gastos *`, `Promedio *`, `Ticket Promedio` → moneda
 - **Gráfico de líneas** `Total Gastos` por mes con **pequeños múltiplos** por `Categorias[tipo]`.
 
 ### Hábitos
-- **Columnas** por `Calendario[Día semana]` → ¿qué días gasto más?
+- **Columnas** por `Calendario[Día semana]` con `Gastos por Fecha de Compra` → ¿qué días gasto más?
 - **Barras** por `Gastos[Medio de pago]`.
 - **Árbol de descomposición**: `Total Gastos` → `tipo` → `Categoría` → `descripcion`.
 

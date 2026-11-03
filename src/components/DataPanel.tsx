@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import type { Category, CustomCategory, Expense } from '../types'
+import type { Category, CreditCard, CustomCategory, Expense } from '../types'
 import { categoriesToCsv, downloadText, expensesToCsv } from '../lib/csv'
 import { normalizeCategories } from '../lib/settings'
 import { isExpense } from '../data/repository'
@@ -7,6 +7,8 @@ import { todayISO } from '../lib/dates'
 
 interface Props {
   expenses: Expense[]
+  /** Para imputar el crédito al mes de vencimiento en gastos.csv */
+  cards: CreditCard[]
   /** Fábrica + propias (archivadas incluidas), para el CSV de Power BI */
   categories: Category[]
   /** Propias, para incluirlas en el backup */
@@ -20,6 +22,7 @@ interface Props {
 
 export function DataPanel({
   expenses,
+  cards,
   categories,
   customCategories,
   onImportCategories,
@@ -37,7 +40,7 @@ export function DataPanel({
   }
 
   function exportPowerBI() {
-    downloadText('gastos.csv', expensesToCsv(expenses))
+    downloadText('gastos.csv', expensesToCsv(expenses, cards))
     setTimeout(() => downloadText('categorias.csv', categoriesToCsv(categories)), 300)
     say('Descargados gastos.csv y categorias.csv — ponelos en la carpeta que lee Power BI.')
   }

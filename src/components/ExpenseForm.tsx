@@ -2,8 +2,8 @@ import { useRef, useState, type FormEvent } from 'react'
 import type { Category, CreditCard, Currency, CustomCategory, Expense, MonthKey, NewExpense, PaymentMethod } from '../types'
 import { PAYMENT_METHODS } from '../types'
 import type { CategoryDraft, CategoryLookup } from '../lib/categories'
-import { defaultDateFor } from '../lib/dates'
-import { formatARS, formatUSD, parseAmount, shortDate } from '../lib/format'
+import { defaultDateFor, monthOf } from '../lib/dates'
+import { formatARS, formatUSD, monthLabel, parseAmount, shortDate } from '../lib/format'
 import { INSTALLMENT_OPTIONS, installmentAmount, installmentPeriods, installmentsOf } from '../lib/cards'
 import { CategoryEditor } from './CategoryEditor'
 
@@ -117,14 +117,14 @@ export function ExpenseForm({
   const n = canInstall ? installments : 1
   const installmentHint =
     n > 1 && Number.isFinite(parsed) && parsed > 0
-      ? `${n} cuotas de ${formatARS(installmentAmount(parsed, n))}: en Gastos se cuenta una por mes desde el mes de la compra.`
+      ? `${n} cuotas de ${formatARS(installmentAmount(parsed, n))}: en Gastos se cuenta una por mes, en el mes en que vence cada resumen.`
       : null
   const statementHint = (() => {
     if (!chosenCard || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null
     const { first, last } = installmentPeriods(chosenCard, date, n)
     return n > 1
       ? `La 1.ª cuota entra en el resumen que vence el ${shortDate(first.dueDate)}; la última, en el que vence el ${shortDate(last.dueDate)}.`
-      : `Entra en el resumen que vence el ${shortDate(first.dueDate)} (cierra el ${shortDate(first.closingDate)}).`
+      : `Entra en el resumen que vence el ${shortDate(first.dueDate)} (cierra el ${shortDate(first.closingDate)}): en Gastos cuenta en ${monthLabel(monthOf(first.dueDate)).split(' ')[0].toLowerCase()}.`
   })()
   const installmentChoices = INSTALLMENT_OPTIONS.includes(installments)
     ? INSTALLMENT_OPTIONS

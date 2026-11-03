@@ -93,15 +93,25 @@ create policy "categories: lectura" on public.categories for select to authentic
 
 -- Vista para Power BI (se consulta con un usuario de base de datos,
 -- no con la anon key; ver docs/setup.md, paso 6).
+-- Una fila por gasto y por mes en que se paga, igual que la pantalla Gastos:
+--   · crédito con tarjeta → mes de vencimiento del resumen donde cae
+--   · cuotas → una fila por cuota, cada una en su mes
+--   · el resto → mes de la compra
+-- "monto" es lo que se imputa a ese mes (la cuota); "monto_total", la compra entera. Clave: (id, cuota).
 -- categoria / tipo salen de la tabla de fábrica o de las categorías propias del usuario.
--- (Columnas nuevas siempre al final: "create or replace view" no permite insertarlas en el medio.)
-create or replace view public.bi_gastos as
+drop view if exists public.bi_gastos;
+create view public.bi_gastos as
 select
   e.id,
   e.user_id,
   u.email          as usuario,
   e.date           as fecha,
-  e.amount         as monto,
+  -- Cuotas en partes iguales; la última absorbe los centavos (igual que installmentAmount en la app)
+  (case
+     when q.n = 1 then e.amount
+     when q.k = q.n - 1 then round(e.amount - floor(e.amount * 100 / q.n) / 100 * (q.n - 1), 2)
+     else floor(e.amount * 100 / q.n) / 100
+   end)::numeric(14, 2) as monto,
   e.category_id    as categoria_id,
   e.description    as descripcion,
   e.payment_method as medio_pago,
@@ -110,13 +120,48 @@ select
   card.value ->> 'name' as tarjeta,
   coalesce(cat.categoria, cc.value ->> 'name', e.category_id) as categoria,
   coalesce(cat.tipo, cc.value ->> 'kind', 'variable')         as tipo,
-  e.installments   as cuotas
+  q.n::smallint    as cuotas,
+  -- Primer día del mes al que se imputa: el del vencimiento si es crédito con tarjeta; si no, el de la compra (+ n.º de cuota)
+  coalesce(r.venc_mes, (date_trunc('month', e.date::timestamp) + make_interval(months => q.k))::date) as mes,
+  r.vencimiento,
+  (q.k + 1)::smallint as cuota,
+  e.amount         as monto_total
 from public.expenses e
 join auth.users u on u.id = e.user_id
 left join public.user_settings s on s.user_id = e.user_id
 left join lateral jsonb_array_elements(s.cards) card on card.value ->> 'id' = e.card_id
 left join public.categories cat on cat.categoria_id = e.category_id
-left join lateral jsonb_array_elements(s.categories) cc on cc.value ->> 'id' = e.category_id;
+left join lateral jsonb_array_elements(s.categories) cc on cc.value ->> 'id' = e.category_id
+-- Una fila por cuota (k = 0 es la primera). Sólo hay cuotas en compras en pesos con crédito.
+cross join lateral (
+  select x.n, g.k
+  from (select case when e.payment_method = 'credito' and e.currency <> 'USD' then greatest(e.installments, 1)::int else 1 end as n) x
+  cross join generate_series(0, x.n - 1) as g(k)
+) q
+-- Resumen de la cuota k: si la compra es posterior al cierre de su mes, entra en el del mes siguiente.
+-- Vence el mismo mes del cierre si dueDay > closingDay; si no, el mes siguiente.
+-- Los días que no existen en un mes (31 en noviembre) pasan al último día, como en la app.
+left join lateral (
+  select
+    v.venc_mes,
+    (v.venc_mes + (least(c.due_day, extract(day from v.venc_mes + interval '1 month - 1 day')::int) - 1))::date as vencimiento
+  from (
+    select (card.value ->> 'closingDay')::int as closing_day, (card.value ->> 'dueDay')::int as due_day
+  ) c
+  cross join lateral (
+    select (
+      date_trunc('month', e.date::timestamp)
+      + make_interval(months =>
+          q.k
+          + case
+              when extract(day from e.date)
+                   > least(c.closing_day, extract(day from date_trunc('month', e.date::timestamp) + interval '1 month - 1 day')::int)
+              then 1 else 0
+            end
+          + case when c.due_day > c.closing_day then 0 else 1 end)
+    )::date as venc_mes
+  ) v
+) r on e.payment_method = 'credito' and card.value is not null;
 
 -- Saldos de ahorro en formato tabla (una fila por carga de saldo)
 create or replace view public.bi_ahorros as

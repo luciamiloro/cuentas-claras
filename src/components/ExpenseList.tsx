@@ -6,7 +6,7 @@ import { dayLabel, formatARS, formatUSD, shortDate } from '../lib/format'
 import type { LedgerEntry } from '../lib/stats'
 
 interface Props {
-  /** Movimientos del mes; las compras en cuotas vienen como una fila por cuota */
+  /** Movimientos imputados al mes (crédito con tarjeta: por vencimiento); las cuotas vienen de a una por fila */
   expenses: LedgerEntry[]
   /** Resuelve categorías de fábrica y propias (archivadas incluidas) */
   getCategory: CategoryLookup
@@ -87,7 +87,10 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
                 const label = e.description || c.name
                 return (
                   <tr key={e.id} className={editingId === realId ? 'is-editing' : ''}>
-                    <td className="date">{dayLabel(e.date)}</td>
+                    <td className="date">
+                      {/* Compra de otro mes que se paga en este (resumen de tarjeta): se ve el mes */}
+                      {e.date.startsWith(e.month) ? dayLabel(e.date) : shortDate(e.date)}
+                    </td>
                     <td>
                       <div className="detail">
                         <span className="detail-main">
@@ -99,7 +102,8 @@ export function ExpenseList({ expenses, getCategory, cards, categoryFilter, onCl
                           )}
                         </span>
                         <span className="detail-sub">
-                          {inst && inst.number > 1 ? `Compra del ${shortDate(inst.sourceDate)} · ` : ''}
+                          {inst && inst.number > 1 && !e.dueDate ? `Compra del ${shortDate(inst.sourceDate)} · ` : ''}
+                          {e.dueDate ? `Vence ${shortDate(e.dueDate)} · ` : ''}
                           {e.description ? `${c.name} · ` : ''}
                           {hasNoCard(e) ? (
                             <button
